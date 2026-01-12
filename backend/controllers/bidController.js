@@ -18,7 +18,12 @@ export const submitBid = async (req, res) => {
       return res.status(400).json({ message: 'Gig is no longer open' });
     }
 
-    if (gig.ownerId.toString() === req.user.userId) {
+    // Check if user is trying to bid on their own gig
+    // Convert both to strings for proper comparison
+    const gigOwnerId = gig.ownerId._id ? gig.ownerId._id.toString() : gig.ownerId.toString();
+    const currentUserId = req.user.userId.toString();
+
+    if (gigOwnerId === currentUserId) {
       return res.status(400).json({ message: 'Cannot bid on your own gig' });
     }
 
