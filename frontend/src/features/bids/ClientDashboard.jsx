@@ -130,7 +130,7 @@ export default function ClientDashboard() {
                         {bid.status === 'pending' && selectedGig.status === 'open' && (
                           <button
                             onClick={() => handleHire(bid._id)}
-                            className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+                            className="px-4 py-2 bg-violet-500 text-white rounded hover:bg-violet-600"
                           >
                             Hire
                           </button>

@@ -1,52 +1,87 @@
-import { useEffect } from 'react'
-import { Routes, Route, Navigate } from 'react-router-dom'
-import { useDispatch, useSelector } from 'react-redux'
-import Navbar from './components/Navbar'
-import ProtectedRoute from './components/ProtectedRoute'
-import RegisterPage from './features/auth/RegisterPage'
-import LoginPage from './features/auth/LoginPage'
-import GigFeed from './features/gigs/GigFeed'
-import CreateGigPage from './features/gigs/CreateGigPage'
-import GigDetailPage from './features/gigs/GigDetailPage'
-import ClientDashboard from './features/bids/ClientDashboard'
-import { store } from './app/store.js'
-import { BrowserRouter } from 'react-router-dom'
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { Routes, Route } from 'react-router-dom';
+import { useSelector } from 'react-redux';
+import { ThemeProvider } from './context/ThemeContext';
+import Navbar from './components/Navbar';
+import Layout from './components/Layout';
+import ProtectedRoute from './components/ProtectedRoute';
+import LandingPage from './features/landing/LandingPage';
+import RegisterPage from './features/auth/RegisterPage';
+import LoginPage from './features/auth/LoginPage';
+import GigFeed from './features/gigs/GigFeed';
+import CreateGigPage from './features/gigs/CreateGigPage';
+import GigDetailPage from './features/gigs/GigDetailPage';
+import ClientDashboard from './features/bids/ClientDashboard';
 
 function App() {
-  const [count, setCount] = useState(0)
+  const { isAuthenticated } = useSelector((state) => state.auth);
+
   return (
-      <div className="min-h-screen bg-gray-50">
-        <Navbar />
-        <main className="container mx-auto px-4 py-8">
-          <Routes>
-            <Route path="/register" element={<RegisterPage />} />
-            <Route path="/login" element={<LoginPage />} />
-            <Route path="/" element={<GigFeed />} />
-            <Route path="/gigs/:gigId" element={<GigDetailPage />} />
-            <Route
-              path="/create-gig"
-              element={
-                <ProtectedRoute>
-                  <CreateGigPage />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/dashboard"
-              element={
-                <ProtectedRoute>
-                  <ClientDashboard />
-                </ProtectedRoute>
-              }
-            />
-          </Routes>
-        </main>
+    <ThemeProvider>
+      <div className="min-h-screen">
+        <Routes>
+          {/* Public Routes - No Navbar */}
+          <Route path="/" element={<LandingPage />} />
+          <Route path="/register" element={<RegisterPage />} />
+          <Route path="/login" element={<LoginPage />} />
+
+          {/* Protected Routes - With Navbar and Sidebar */}
+          <Route
+            path="/browse"
+            element={
+              <ProtectedRoute>
+                <>
+                  <Navbar />
+                  <Layout>
+                    <GigFeed />
+                  </Layout>
+                </>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/gigs/:gigId"
+            element={
+              <ProtectedRoute>
+                <>
+                  <Navbar />
+                  <Layout>
+                    <GigDetailPage />
+                  </Layout>
+                </>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/create-gig"
+            element={
+              <ProtectedRoute>
+                <>
+                  <Navbar />
+                  <Layout>
+                    <CreateGigPage />
+                  </Layout>
+                </>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/dashboard"
+            element={
+              <ProtectedRoute>
+                <>
+                  <Navbar />
+                  <Layout>
+                    <ClientDashboard />
+                  </Layout>
+                </>
+              </ProtectedRoute>
+            }
+          />
+        </Routes>
       </div>
-  )
+    </ThemeProvider>
+  );
 }
 
-export default App
+export default App;
+

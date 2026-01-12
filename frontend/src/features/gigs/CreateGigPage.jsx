@@ -52,7 +52,7 @@ export default function CreateGigPage() {
               name="title"
               value={formData.title}
               onChange={handleChange}
-              className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-violet-500"
               required
             />
           </div>
@@ -64,7 +64,7 @@ export default function CreateGigPage() {
               value={formData.description}
               onChange={handleChange}
               rows="4"
-              className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-violet-500"
               required
             />
           </div>
@@ -78,7 +78,7 @@ export default function CreateGigPage() {
               onChange={handleChange}
               min="0"
               step="0.01"
-              className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-violet-500"
               required
             />
           </div>
@@ -86,7 +86,7 @@ export default function CreateGigPage() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-blue-500 text-white py-2 rounded-lg hover:bg-blue-600 disabled:bg-gray-400"
+            className="w-full bg-violet-500 text-white py-2 rounded-lg hover:bg-violet-600 disabled:bg-gray-400"
           >
             {loading ? 'Creating...' : 'Create Gig'}
           </button>
