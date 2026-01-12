@@ -49,7 +49,7 @@ export default function GigDetailPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-20">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-violet-600"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-slate-700"></div>
       </div>
     );
   }
@@ -58,7 +58,7 @@ export default function GigDetailPage() {
     return (
       <div className="text-center py-20">
         <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Gig not found</h2>
-        <Link to="/browse" className="text-violet-600 dark:text-violet-400 hover:underline">
+        <Link to="/browse" className="text-slate-700 dark:text-cyan-400 hover:underline">
           ← Back to browse
         </Link>
       </div>
@@ -100,7 +100,7 @@ export default function GigDetailPage() {
                 </div>
               </div>
               <div className={`px-4 py-2 rounded-full font-semibold text-sm ${gig.status === 'open'
-                  ? 'bg-emerald-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400'
+                  ? 'bg-emerald-100 dark:bg-cyan-900/30 text-cyan-600 dark:text-cyan-300'
                   : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-400'
                 }`}>
                 {gig.status === 'open' ? 'Open' : 'Assigned'}
@@ -117,7 +117,7 @@ export default function GigDetailPage() {
 
           {/* Owner Message */}
           {isOwner && (
-            <div className="p-6 bg-violet-50 dark:bg-blue-900/20 border-l-4 border-violet-600 rounded-lg">
+            <div className="p-6 bg-slate-50 dark:bg-blue-900/20 border-l-4 border-slate-700 rounded-lg">
               <p className="text-blue-900 dark:text-blue-300 font-medium">
                 This is your gig. Go to <Link to="/dashboard" className="underline font-bold">Dashboard</Link> to view and manage bids.
               </p>
@@ -131,8 +131,8 @@ export default function GigDetailPage() {
           <div className="glass rounded-2xl p-6 border border-gray-200 dark:border-slate-700">
             <h3 className="text-sm font-semibold text-gray-600 dark:text-gray-400 mb-2">Project Budget</h3>
             <div className="flex items-center gap-2">
-              <DollarSign className="w-8 h-8 text-amber-600 dark:text-amber-400" />
-              <span className="text-4xl font-bold text-amber-600 dark:text-amber-400">
+              <DollarSign className="w-8 h-8 text-cyan-500 dark:text-cyan-300" />
+              <span className="text-4xl font-bold text-cyan-500 dark:text-cyan-300">
                 ${gig.budget}
               </span>
             </div>
@@ -146,9 +146,9 @@ export default function GigDetailPage() {
               </h2>
 
               {bidSuccess && (
-                <div className="mb-6 p-4 bg-amber-50 dark:bg-amber-900/20 border-l-4 border-amber-500 rounded-lg flex items-center gap-2 animate-fade-in">
-                  <CheckCircle className="w-5 h-5 text-amber-600 dark:text-amber-400" />
-                  <p className="text-amber-700 dark:text-amber-400 font-medium">Bid submitted successfully!</p>
+                <div className="mb-6 p-4 bg-cyan-50 dark:bg-cyan-900/20 border-l-4 border-cyan-500 rounded-lg flex items-center gap-2 animate-fade-in">
+                  <CheckCircle className="w-5 h-5 text-cyan-500 dark:text-cyan-300" />
+                  <p className="text-cyan-600 dark:text-cyan-300 font-medium">Bid submitted successfully!</p>
                 </div>
               )}
 
@@ -173,7 +173,7 @@ export default function GigDetailPage() {
                       onChange={(e) => setBidForm({ ...bidForm, price: e.target.value })}
                       min="0"
                       step="0.01"
-                      className="w-full pl-10 pr-4 py-3 bg-white dark:bg-slate-700 border-2 border-gray-200 dark:border-slate-600 rounded-lg focus:outline-none focus:border-violet-600 dark:focus:border-violet-400 text-gray-900 dark:text-white transition-all"
+                      className="w-full pl-10 pr-4 py-3 bg-white dark:bg-slate-700 border-2 border-gray-200 dark:border-slate-600 rounded-lg focus:outline-none focus:border-slate-700 dark:focus:border-cyan-400 text-gray-900 dark:text-white transition-all"
                       placeholder="Enter your bid amount"
                       required
                     />
@@ -190,7 +190,7 @@ export default function GigDetailPage() {
                       value={bidForm.message}
                       onChange={(e) => setBidForm({ ...bidForm, message: e.target.value })}
                       rows="5"
-                      className="w-full pl-10 pr-4 py-3 bg-white dark:bg-slate-700 border-2 border-gray-200 dark:border-slate-600 rounded-lg focus:outline-none focus:border-violet-600 dark:focus:border-violet-400 text-gray-900 dark:text-white transition-all resize-none"
+                      className="w-full pl-10 pr-4 py-3 bg-white dark:bg-slate-700 border-2 border-gray-200 dark:border-slate-600 rounded-lg focus:outline-none focus:border-slate-700 dark:focus:border-cyan-400 text-gray-900 dark:text-white transition-all resize-none"
                       placeholder="Explain why you're the best fit for this project..."
                       required
                     />
@@ -200,7 +200,7 @@ export default function GigDetailPage() {
                 <button
                   type="submit"
                   disabled={bidLoading}
-                  className="w-full flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-violet-600 to-amber-600 hover:from-violet-700 hover:to-amber-700 text-white font-semibold rounded-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+                  className="w-full flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-slate-800 to-cyan-500 hover:from-slate-800 hover:to-cyan-600 text-white font-semibold rounded-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
                 >
                   <Send size={20} />
                   {bidLoading ? 'Submitting...' : 'Submit Bid'}
@@ -217,7 +217,7 @@ export default function GigDetailPage() {
               </p>
               <Link
                 to="/login"
-                className="inline-block px-6 py-2 bg-violet-600 hover:bg-violet-700 text-white font-semibold rounded-lg transition-all"
+                className="inline-block px-6 py-2 bg-slate-700 hover:bg-slate-800 text-white font-semibold rounded-lg transition-all"
               >
                 Login
               </Link>

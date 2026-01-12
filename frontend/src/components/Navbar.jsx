@@ -48,7 +48,7 @@ export default function Navbar() {
                 </span>
                 <Link
                   to="/create-gig"
-                  className="px-4 py-2 bg-violet-600 hover:bg-violet-700 text-white rounded-lg font-medium transition-all transform hover:scale-105"
+                  className="px-4 py-2 bg-slate-700 hover:bg-slate-800 text-white rounded-lg font-medium transition-all transform hover:scale-105"
                 >
                   Create Gig
                 </Link>
@@ -69,13 +69,13 @@ export default function Navbar() {
               <>
                 <Link
                   to="/login"
-                  className="px-4 py-2 text-gray-700 dark:text-gray-300 hover:text-violet-600 dark:hover:text-violet-400 font-medium transition-colors"
+                  className="px-4 py-2 text-gray-700 dark:text-gray-300 hover:text-slate-700 dark:hover:text-cyan-400 font-medium transition-colors"
                 >
                   Login
                 </Link>
                 <Link
                   to="/register"
-                  className="px-4 py-2 bg-violet-600 hover:bg-violet-700 text-white rounded-lg font-medium transition-all transform hover:scale-105"
+                  className="px-4 py-2 bg-slate-700 hover:bg-slate-800 text-white rounded-lg font-medium transition-all transform hover:scale-105"
                 >
                   Register
                 </Link>
@@ -113,7 +113,7 @@ export default function Navbar() {
                 </div>
                 <Link
                   to="/create-gig"
-                  className="block px-4 py-2 bg-violet-600 text-white rounded-lg text-center font-medium"
+                  className="block px-4 py-2 bg-slate-700 text-white rounded-lg text-center font-medium"
                   onClick={() => setMobileMenuOpen(false)}
                 >
                   Create Gig
@@ -146,7 +146,7 @@ export default function Navbar() {
                 </Link>
                 <Link
                   to="/register"
-                  className="block px-4 py-2 bg-violet-600 text-white rounded-lg text-center font-medium"
+                  className="block px-4 py-2 bg-slate-700 text-white rounded-lg text-center font-medium"
                   onClick={() => setMobileMenuOpen(false)}
                 >
                   Register

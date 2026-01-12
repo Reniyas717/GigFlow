@@ -34,7 +34,7 @@ export default function Sidebar() {
             {/* Toggle Button */}
             <button
                 onClick={() => setIsCollapsed(!isCollapsed)}
-                className="absolute -right-3 top-6 w-6 h-6 bg-violet-600 hover:bg-violet-700 text-white rounded-full flex items-center justify-center shadow-lg transition-all duration-200"
+                className="absolute -right-3 top-6 w-6 h-6 bg-slate-700 hover:bg-slate-800 text-white rounded-full flex items-center justify-center shadow-lg transition-all duration-200"
             >
                 {isCollapsed ? <ChevronRight size={14} /> : <ChevronLeft size={14} />}
             </button>
@@ -46,7 +46,7 @@ export default function Sidebar() {
                         key={index}
                         to={item.path}
                         className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 ${isActive(item.path)
-                                ? 'bg-violet-600 text-white shadow-lg'
+                                ? 'bg-slate-700 text-white shadow-lg'
                                 : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-700'
                             }`}
                         title={isCollapsed ? item.label : ''}

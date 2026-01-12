@@ -35,7 +35,7 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-amber-50 via-white to-violet-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 px-4 py-12">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-cyan-50 via-white to-slate-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 px-4 py-12">
       <div className="w-full max-w-md">
         {/* Logo */}
         <div className="text-center mb-8">
@@ -72,7 +72,7 @@ export default function RegisterPage() {
                   name="name"
                   value={formData.name}
                   onChange={handleChange}
-                  className="w-full pl-10 pr-4 py-3 bg-white dark:bg-slate-700 border-2 border-gray-200 dark:border-slate-600 rounded-lg focus:outline-none focus:border-amber-600 dark:focus:border-amber-400 text-gray-900 dark:text-white transition-all"
+                  className="w-full pl-10 pr-4 py-3 bg-white dark:bg-slate-700 border-2 border-gray-200 dark:border-slate-600 rounded-lg focus:outline-none focus:border-cyan-500 dark:focus:border-cyan-300 text-gray-900 dark:text-white transition-all"
                   placeholder="John Doe"
                   required
                 />
@@ -93,7 +93,7 @@ export default function RegisterPage() {
                   name="email"
                   value={formData.email}
                   onChange={handleChange}
-                  className="w-full pl-10 pr-4 py-3 bg-white dark:bg-slate-700 border-2 border-gray-200 dark:border-slate-600 rounded-lg focus:outline-none focus:border-amber-600 dark:focus:border-amber-400 text-gray-900 dark:text-white transition-all"
+                  className="w-full pl-10 pr-4 py-3 bg-white dark:bg-slate-700 border-2 border-gray-200 dark:border-slate-600 rounded-lg focus:outline-none focus:border-cyan-500 dark:focus:border-cyan-300 text-gray-900 dark:text-white transition-all"
                   placeholder="you@example.com"
                   required
                 />
@@ -114,7 +114,7 @@ export default function RegisterPage() {
                   name="password"
                   value={formData.password}
                   onChange={handleChange}
-                  className="w-full pl-10 pr-4 py-3 bg-white dark:bg-slate-700 border-2 border-gray-200 dark:border-slate-600 rounded-lg focus:outline-none focus:border-amber-600 dark:focus:border-amber-400 text-gray-900 dark:text-white transition-all"
+                  className="w-full pl-10 pr-4 py-3 bg-white dark:bg-slate-700 border-2 border-gray-200 dark:border-slate-600 rounded-lg focus:outline-none focus:border-cyan-500 dark:focus:border-cyan-300 text-gray-900 dark:text-white transition-all"
                   placeholder="••••••••"
                   required
                 />
@@ -125,7 +125,7 @@ export default function RegisterPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-amber-600 to-violet-600 hover:from-amber-700 hover:to-violet-700 text-white font-semibold rounded-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+              className="w-full flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-cyan-500 to-slate-700 hover:from-cyan-600 hover:to-slate-800 text-white font-semibold rounded-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
             >
               <UserPlus size={20} />
               {loading ? 'Creating account...' : 'Create Account'}
@@ -138,7 +138,7 @@ export default function RegisterPage() {
               Already have an account?{' '}
               <Link
                 to="/login"
-                className="text-amber-600 dark:text-amber-400 hover:text-amber-700 dark:hover:text-emerald-300 font-semibold transition-colors"
+                className="text-cyan-500 dark:text-cyan-300 hover:text-cyan-600 dark:hover:text-emerald-300 font-semibold transition-colors"
               >
                 Sign in instead
               </Link>

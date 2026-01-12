@@ -41,11 +41,11 @@ export default function GigFeed() {
             placeholder="Search gigs by title..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full pl-12 pr-32 py-4 bg-white dark:bg-slate-800 border-2 border-gray-200 dark:border-slate-700 rounded-xl focus:outline-none focus:border-violet-600 dark:focus:border-violet-400 text-gray-900 dark:text-white text-lg transition-all shadow-sm"
+            className="w-full pl-12 pr-32 py-4 bg-white dark:bg-slate-800 border-2 border-gray-200 dark:border-slate-700 rounded-xl focus:outline-none focus:border-slate-700 dark:focus:border-cyan-400 text-gray-900 dark:text-white text-lg transition-all shadow-sm"
           />
           <button
             type="submit"
-            className="absolute right-2 top-2 px-6 py-2 bg-gradient-to-r from-violet-600 to-amber-600 hover:from-violet-700 hover:to-amber-700 text-white font-semibold rounded-lg transition-all transform hover:scale-105"
+            className="absolute right-2 top-2 px-6 py-2 bg-gradient-to-r from-slate-800 to-cyan-500 hover:from-slate-800 hover:to-cyan-600 text-white font-semibold rounded-lg transition-all transform hover:scale-105"
           >
             Search
           </button>
@@ -96,7 +96,7 @@ export default function GigFeed() {
                   className="glass rounded-2xl p-6 hover:shadow-2xl transform hover:scale-105 transition-all duration-300 border border-gray-200 dark:border-slate-700 group"
                 >
                   {/* Title */}
-                  <h3 className="text-xl font-bold mb-3 text-gray-900 dark:text-white group-hover:text-violet-600 dark:group-hover:text-violet-400 transition-colors line-clamp-2">
+                  <h3 className="text-xl font-bold mb-3 text-gray-900 dark:text-white group-hover:text-slate-700 dark:group-hover:text-cyan-400 transition-colors line-clamp-2">
                     {gig.title}
                   </h3>
 
@@ -106,9 +106,9 @@ export default function GigFeed() {
                   </p>
 
                   {/* Budget */}
-                  <div className="flex items-center gap-2 mb-4 p-3 bg-amber-50 dark:bg-amber-900/20 rounded-lg">
-                    <DollarSign className="w-5 h-5 text-amber-600 dark:text-amber-400" />
-                    <span className="text-2xl font-bold text-amber-600 dark:text-amber-400">
+                  <div className="flex items-center gap-2 mb-4 p-3 bg-cyan-50 dark:bg-cyan-900/20 rounded-lg">
+                    <DollarSign className="w-5 h-5 text-cyan-500 dark:text-cyan-300" />
+                    <span className="text-2xl font-bold text-cyan-500 dark:text-cyan-300">
                       ${gig.budget}
                     </span>
                     <span className="text-sm text-gray-600 dark:text-gray-400">budget</span>
@@ -123,7 +123,7 @@ export default function GigFeed() {
                   {/* View Details Button */}
                   <Link
                     to={`/gigs/${gig._id}`}
-                    className="block w-full px-4 py-3 bg-gradient-to-r from-violet-600 to-amber-600 hover:from-violet-700 hover:to-amber-700 text-white text-center font-semibold rounded-lg transition-all transform hover:scale-105 shadow-lg"
+                    className="block w-full px-4 py-3 bg-gradient-to-r from-slate-800 to-cyan-500 hover:from-slate-800 hover:to-cyan-600 text-white text-center font-semibold rounded-lg transition-all transform hover:scale-105 shadow-lg"
                   >
                     View Details
                   </Link>

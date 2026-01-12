@@ -1,16 +1,32 @@
 import { Link } from 'react-router-dom';
 import LightRays from '../../components/LightRays';
-import { Briefcase, Users, Shield, Zap, CheckCircle, TrendingUp } from 'lucide-react';
+import { Briefcase, Users, Shield, Zap, CheckCircle, TrendingUp, Sun, Moon } from 'lucide-react';
+import { useTheme } from '../../context/ThemeContext';
 
 export default function LandingPage() {
+    const { theme, toggleTheme } = useTheme();
+
     return (
         <div className="min-h-screen bg-gray-50 dark:bg-slate-900">
+            {/* Theme Toggle - Fixed Position */}
+            <button
+                onClick={toggleTheme}
+                className="fixed top-6 right-6 z-50 p-3 rounded-full bg-white dark:bg-slate-800 shadow-lg hover:shadow-xl transition-all transform hover:scale-110"
+                aria-label="Toggle theme"
+            >
+                {theme === 'light' ? (
+                    <Moon size={24} className="text-slate-700" />
+                ) : (
+                    <Sun size={24} className="text-cyan-400" />
+                )}
+            </button>
+
             {/* Hero Section with LightRays */}
             <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
                 <div className="absolute inset-0 z-0">
                     <LightRays
                         raysOrigin="top-center"
-                        raysColor="#7C3AED"
+                        raysColor="#06B6D4"
                         raysSpeed={1.5}
                         lightSpread={0.8}
                         rayLength={1.2}
@@ -35,13 +51,13 @@ export default function LandingPage() {
                     <div className="flex flex-col sm:flex-row gap-4 justify-center animate-fade-in">
                         <Link
                             to="/register"
-                            className="px-8 py-4 bg-violet-600 hover:bg-violet-700 text-white text-lg font-semibold rounded-lg shadow-lg hover:shadow-xl transform hover:scale-105"
+                            className="px-8 py-4 bg-slate-700 hover:bg-slate-800 text-white text-lg font-semibold rounded-lg shadow-lg hover:shadow-xl transform hover:scale-105"
                         >
                             Get Started Free
                         </Link>
                         <Link
                             to="/login"
-                            className="px-8 py-4 bg-white dark:bg-slate-800 hover:bg-gray-100 dark:hover:bg-slate-700 text-violet-600 dark:text-violet-400 text-lg font-semibold rounded-lg shadow-lg hover:shadow-xl transform hover:scale-105 border-2 border-violet-600 dark:border-violet-400"
+                            className="px-8 py-4 bg-white dark:bg-slate-800 hover:bg-gray-100 dark:hover:bg-slate-700 text-slate-700 dark:text-cyan-400 text-lg font-semibold rounded-lg shadow-lg hover:shadow-xl transform hover:scale-105 border-2 border-slate-700 dark:border-cyan-400"
                         >
                             Sign In
                         </Link>
@@ -98,7 +114,7 @@ export default function LandingPage() {
                                 key={index}
                                 className="p-8 rounded-2xl glass hover:shadow-2xl transform hover:scale-105 transition-all duration-300"
                             >
-                                <div className="text-violet-600 dark:text-violet-400 mb-4">
+                                <div className="text-slate-700 dark:text-cyan-400 mb-4">
                                     {feature.icon}
                                 </div>
                                 <h3 className="text-2xl font-bold mb-3 text-gray-900 dark:text-white">
@@ -144,7 +160,7 @@ export default function LandingPage() {
                             }
                         ].map((step, index) => (
                             <div key={index} className="text-center">
-                                <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-gradient-to-br from-violet-600 to-amber-600 text-white text-2xl font-bold mb-6 shadow-lg">
+                                <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-gradient-to-br from-slate-800 to-cyan-500 text-white text-2xl font-bold mb-6 shadow-lg">
                                     {step.step}
                                 </div>
                                 <h3 className="text-2xl font-bold mb-3 text-gray-900 dark:text-white">
@@ -160,7 +176,7 @@ export default function LandingPage() {
             </section>
 
             {/* Statistics Section */}
-            <section className="py-20 bg-gradient-to-br from-violet-600 to-amber-600 text-white">
+            <section className="py-20 bg-gradient-to-br from-slate-800 to-cyan-500 text-white">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-12 text-center">
                         {[
@@ -192,7 +208,7 @@ export default function LandingPage() {
                     </p>
                     <Link
                         to="/register"
-                        className="inline-block px-10 py-5 bg-gradient-to-r from-violet-600 to-amber-600 hover:from-violet-700 hover:to-amber-700 text-white text-xl font-semibold rounded-lg shadow-2xl hover:shadow-3xl transform hover:scale-105 transition-all duration-300"
+                        className="inline-block px-10 py-5 bg-gradient-to-r from-slate-800 to-cyan-500 hover:from-slate-800 hover:to-cyan-600 text-white text-xl font-semibold rounded-lg shadow-2xl hover:shadow-3xl transform hover:scale-105 transition-all duration-300"
                     >
                         Create Your Free Account
                     </Link>
