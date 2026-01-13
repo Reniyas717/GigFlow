@@ -9,6 +9,7 @@ export default function CreateGigPage() {
     title: '',
     description: '',
     budget: '',
+    positionsAvailable: 1,
   });
 
   const dispatch = useDispatch();
@@ -27,7 +28,8 @@ export default function CreateGigPage() {
     e.preventDefault();
     const result = await dispatch(createGig({
       ...formData,
-      budget: Number(formData.budget)
+      budget: Number(formData.budget),
+      positionsAvailable: Number(formData.positionsAvailable)
     }));
     if (result.type === 'gigs/createGig/fulfilled') {
       navigate('/browse');
@@ -109,6 +111,26 @@ export default function CreateGigPage() {
                 required
               />
             </div>
+          </div>
+
+          {/* Positions Available */}
+          <div>
+            <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+              Positions Available
+            </label>
+            <input
+              type="number"
+              name="positionsAvailable"
+              value={formData.positionsAvailable}
+              onChange={handleChange}
+              min="1"
+              className="w-full px-4 py-3 bg-white dark:bg-slate-700 border-2 border-gray-200 dark:border-slate-600 rounded-lg focus:outline-none focus:border-slate-700 dark:focus:border-cyan-400 text-gray-900 dark:text-white transition-all"
+              placeholder="Number of people needed"
+              required
+            />
+            <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+              How many freelancers do you need for this gig?
+            </p>
           </div>
 
           {/* Submit Button */}

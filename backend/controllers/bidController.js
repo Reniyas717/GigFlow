@@ -14,8 +14,16 @@ export const submitBid = async (req, res) => {
       return res.status(404).json({ message: 'Gig not found' });
     }
 
-    if (gig.status !== 'open') {
-      return res.status(400).json({ message: 'This gig is no longer accepting bids' });
+    // Check if gig is accepting bids (open or assigned but not filled)
+    if (gig.status === 'filled') {
+      return res.status(400).json({ message: 'This gig has filled all positions' });
+    }
+
+    // Check if there are still positions available
+    const positionsFilled = gig.positionsFilled || 0;
+    const positionsAvailable = gig.positionsAvailable || 1;
+    if (positionsFilled >= positionsAvailable) {
+      return res.status(400).json({ message: 'All positions for this gig have been filled' });
     }
 
     // Check if user is trying to bid on their own gig
@@ -133,7 +141,20 @@ export const hireBid = async (req, res) => {
     bid.status = 'hired';
     await bid.save();
 
-    gig.status = 'assigned';
+    // Increment positions filled
+    gig.positionsFilled = (gig.positionsFilled || 0) + 1;
+
+    // Check if all positions are filled
+    if (gig.positionsFilled >= gig.positionsAvailable) {
+      gig.status = 'filled';
+      // Reject all remaining pending bids
+      await Bid.updateMany(
+        { gigId: bid.gigId, status: 'pending' },
+        { status: 'rejected' }
+      );
+    }
+    // Keep status as 'open' if there are still positions available
+
     await gig.save();
 
     // Emit real-time event to all affected users

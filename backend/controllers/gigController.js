@@ -2,7 +2,7 @@ import Gig from '../models/Gig.js';
 
 export const createGig = async (req, res) => {
   try {
-    const { title, description, budget } = req.body;
+    const { title, description, budget, positionsAvailable } = req.body;
 
     if (!title || !description || budget === undefined) {
       return res.status(400).json({ message: 'All fields are required' });
@@ -13,7 +13,9 @@ export const createGig = async (req, res) => {
       description,
       budget,
       ownerId: req.user.userId,
-      status: 'open'
+      status: 'open',
+      positionsAvailable: positionsAvailable || 1,
+      positionsFilled: 0
     });
 
     // Populate owner info before emitting

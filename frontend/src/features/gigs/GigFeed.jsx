@@ -138,6 +138,15 @@ export default function GigFeed() {
                   <span>Posted by <span className="font-semibold">{gig.ownerId?.name || 'Unknown'}</span></span>
                 </div>
 
+                {/* Positions Available */}
+                {gig.positionsAvailable && gig.positionsAvailable > 1 && (
+                  <div className="flex items-center gap-2 text-sm mb-4 px-3 py-2 bg-green-50 dark:bg-green-900/20 rounded-lg border border-green-200 dark:border-green-800">
+                    <span className="font-semibold text-green-700 dark:text-green-400">
+                      {(gig.positionsAvailable - (gig.positionsFilled || 0))} / {gig.positionsAvailable} positions available
+                    </span>
+                  </div>
+                )}
+
                 {/* View Details Button */}
                 <Link
                   to={`/gigs/${gig._id}`}

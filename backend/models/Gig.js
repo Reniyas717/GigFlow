@@ -22,8 +22,19 @@ const gigSchema = new mongoose.Schema({
   },
   status: {
     type: String,
-    enum: ['open', 'assigned'],
+    enum: ['open', 'assigned', 'filled'],
     default: 'open'
+  },
+  positionsAvailable: {
+    type: Number,
+    required: true,
+    min: 1,
+    default: 1
+  },
+  positionsFilled: {
+    type: Number,
+    default: 0,
+    min: 0
   }
 }, { timestamps: true });
 
