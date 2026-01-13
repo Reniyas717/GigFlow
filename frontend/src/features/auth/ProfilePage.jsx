@@ -62,12 +62,12 @@ export default function ProfilePage() {
         const fetchStats = async () => {
             try {
                 const [gigsRes, bidsRes] = await Promise.all([
-                    api.get('/gigs'),
+                    api.get('/gigs/all'),  // Changed to /all to get ALL gigs
                     api.get('/bids/my-bids')
                 ]);
 
                 const userGigs = gigsRes.data.filter(g =>
-                    (g.ownerId._id && g.ownerId._id === user.id) || g.ownerId === user.id
+                    (g.ownerId?._id && g.ownerId._id === user.id) || g.ownerId === user.id
                 );
                 const userBids = bidsRes.data;
 
@@ -77,7 +77,7 @@ export default function ProfilePage() {
                     projectsCompleted: userGigs.filter(g => g.status === 'assigned').length
                 });
             } catch (error) {
-                console.error('Failed to fetch stats');
+                console.error('Failed to fetch stats:', error);
             }
         };
 

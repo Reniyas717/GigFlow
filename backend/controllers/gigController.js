@@ -35,15 +35,36 @@ export const createGig = async (req, res) => {
 
 export const getGigs = async (req, res) => {
   try {
-    const { search } = req.query;
+    const { search, _id } = req.query;
 
-    const query = { status: 'open' };
+    let query = {};
+
+    // If specific gig ID requested
+    if (_id) {
+      query._id = _id;
+    } else {
+      // Otherwise only show open gigs
+      query.status = 'open';
+    }
 
     if (search) {
       query.title = { $regex: search, $options: 'i' };
     }
 
     const gigs = await Gig.find(query)
+      .populate('ownerId', 'name email')
+      .sort({ createdAt: -1 });
+
+    res.json(gigs);
+  } catch (error) {
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+};
+
+// Get all gigs for a specific user (for profile stats)
+export const getAllGigs = async (req, res) => {
+  try {
+    const gigs = await Gig.find()
       .populate('ownerId', 'name email')
       .sort({ createdAt: -1 });
 

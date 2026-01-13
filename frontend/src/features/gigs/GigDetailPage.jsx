@@ -65,7 +65,7 @@ export default function GigDetailPage() {
     );
   }
 
-  const isOwner = user && user.id === gig.ownerId._id;
+  const isOwner = user && gig.ownerId && (user.id === gig.ownerId._id || user.id === gig.ownerId);
 
   return (
     <div className="max-w-7xl mx-auto">
@@ -91,7 +91,7 @@ export default function GigDetailPage() {
                 <div className="flex items-center gap-4 text-sm text-gray-600 dark:text-gray-400">
                   <div className="flex items-center gap-2">
                     <User className="w-4 h-4" />
-                    <span>Posted by <span className="font-semibold">{gig.ownerId.name}</span></span>
+                    <span>Posted by <span className="font-semibold">{gig.ownerId?.name || 'Unknown'}</span></span>
                   </div>
                   <div className="flex items-center gap-2">
                     <Calendar className="w-4 h-4" />
@@ -100,8 +100,8 @@ export default function GigDetailPage() {
                 </div>
               </div>
               <div className={`px-4 py-2 rounded-full font-semibold text-sm ${gig.status === 'open'
-                  ? 'bg-emerald-100 dark:bg-cyan-900/30 text-cyan-600 dark:text-cyan-300'
-                  : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-400'
+                ? 'bg-emerald-100 dark:bg-cyan-900/30 text-cyan-600 dark:text-cyan-300'
+                : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-400'
                 }`}>
                 {gig.status === 'open' ? 'Open' : 'Assigned'}
               </div>

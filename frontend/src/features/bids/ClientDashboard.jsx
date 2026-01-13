@@ -22,16 +22,23 @@ export default function ClientDashboard() {
   useEffect(() => {
     const fetchMyGigs = async () => {
       try {
-        const response = await api.get('/gigs');
-        const userGigs = response.data.filter(gig => gig.ownerId._id === user.id);
+        const response = await api.get('/gigs/all');
+        // Filter gigs created by current user
+        const userGigs = response.data.filter(gig => {
+          if (!gig.ownerId) return false;
+          const ownerId = gig.ownerId._id || gig.ownerId;
+          return ownerId === user.id;
+        });
         setMyGigs(userGigs);
       } catch (error) {
-        console.error('Failed to fetch gigs');
+        console.error('Failed to fetch gigs:', error);
       } finally {
         setLoading(false);
       }
     };
-    fetchMyGigs();
+    if (user) {
+      fetchMyGigs();
+    }
   }, [user]);
 
   // Listen for real-time bid submissions
@@ -124,11 +131,26 @@ export default function ClientDashboard() {
     }
   };
 
+  const handleReject = async (bidId) => {
+    if (window.confirm('Are you sure you want to reject this bid?')) {
+      try {
+        await api.patch(`/bids/${bidId}/reject`);
+        addToast('Bid rejected', 'warning');
+        // Refresh bids
+        if (selectedGig) {
+          dispatch(fetchBidsForGig(selectedGig._id));
+        }
+      } catch (error) {
+        alert(error.response?.data?.message || 'Failed to reject bid');
+      }
+    }
+  };
+
   // Calculate stats
   const stats = {
     totalGigs: myGigs.length,
     openGigs: myGigs.filter(g => g.status === 'open').length,
-    closedGigs: myGigs.filter(g => g.status === 'closed').length,
+    assignedGigs: myGigs.filter(g => g.status === 'assigned').length,
     totalBudget: myGigs.reduce((sum, g) => sum + g.budget, 0),
   };
 
@@ -186,11 +208,11 @@ export default function ClientDashboard() {
           <div className="glass rounded-xl p-6 border border-gray-200 dark:border-slate-700">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Closed Gigs</p>
-                <p className="text-3xl font-bold text-gray-600 dark:text-gray-400 mt-2">{stats.closedGigs}</p>
+                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Assigned Gigs</p>
+                <p className="text-3xl font-bold text-cyan-600 dark:text-cyan-400 mt-2">{stats.assignedGigs}</p>
               </div>
-              <div className="p-3 bg-gray-600 dark:bg-gray-500/20 rounded-lg">
-                <CheckCircle className="w-6 h-6 text-white dark:text-gray-400" />
+              <div className="p-3 bg-cyan-600 dark:bg-cyan-500/20 rounded-lg">
+                <CheckCircle className="w-6 h-6 text-white dark:text-cyan-400" />
               </div>
             </div>
           </div>
@@ -341,6 +363,12 @@ export default function ClientDashboard() {
                           </span>
                           {bid.status === 'pending' && selectedGig.status === 'open' && (
                             <div className="flex gap-2">
+                              <button
+                                onClick={() => handleReject(bid._id)}
+                                className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all"
+                              >
+                                Reject
+                              </button>
                               <button
                                 onClick={() => handleCounterOffer(bid._id, bid.price)}
                                 className="px-4 py-2 bg-yellow-600 hover:bg-yellow-700 text-white font-semibold rounded-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all"

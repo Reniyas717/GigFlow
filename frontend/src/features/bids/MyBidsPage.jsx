@@ -26,7 +26,27 @@ export default function MyBidsPage() {
             }
         };
         fetchMyBids();
-    }, [user]);
+    }, []);
+
+    // Listen for own bid submissions
+    useEffect(() => {
+        if (socket && user) {
+            const handleBidSubmitted = async ({ bid }) => {
+                // Check if this is the current user's bid
+                const bidFreelancerId = bid.freelancerId?._id || bid.freelancerId;
+                if (bidFreelancerId === user.id) {
+                    console.log('✅ Own bid submitted, refreshing My Bids');
+                    // Refresh bids
+                    const response = await api.get('/bids/my-bids');
+                    setMyBids(response.data);
+                    addToast('Your bid was submitted successfully!', 'success');
+                }
+            };
+
+            socket.on('bid:submitted', handleBidSubmitted);
+            return () => socket.off('bid:submitted', handleBidSubmitted);
+        }
+    }, [socket, user, addToast]);
 
     // Listen for real-time bid hire/reject events
     useEffect(() => {
@@ -63,9 +83,23 @@ export default function MyBidsPage() {
                 }
             });
 
+            socket.on('bid:rejected', ({ bidId, freelancerId }) => {
+                if (freelancerId === user.id) {
+                    console.log('❌ Bid rejected, refreshing My Bids');
+                    // Refresh bids
+                    const fetchBids = async () => {
+                        const response = await api.get('/bids/my-bids');
+                        setMyBids(response.data);
+                    };
+                    fetchBids();
+                    addToast('Your bid was rejected', 'warning');
+                }
+            });
+
             return () => {
                 socket.off('bid:hired');
                 socket.off('bid:counter-offered');
+                socket.off('bid:rejected');
             };
         }
     }, [socket, user, addToast]);

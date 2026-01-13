@@ -19,6 +19,10 @@ export const submitBid = async (req, res) => {
     }
 
     // Check if user is trying to bid on their own gig
+    if (!gig.ownerId) {
+      return res.status(400).json({ message: 'Gig owner information is missing' });
+    }
+
     const gigOwnerId = gig.ownerId._id ? gig.ownerId._id.toString() : gig.ownerId.toString();
     const currentUserId = req.user.userId.toString();
 
@@ -51,27 +55,32 @@ export const submitBid = async (req, res) => {
       status: 'pending'
     });
 
-    // Populate bid details
-    await bid.populate('freelancerId', 'name email');
-    await bid.populate('gigId', 'title');
+    // Populate bid details for response
+    const populatedBid = await Bid.findById(bid._id)
+      .populate('freelancerId', 'name email')
+      .populate('gigId', 'title ownerId');
+
+    // Get owner ID for Socket emission
+    const ownerIdForSocket = gig.ownerId._id ? gig.ownerId._id.toString() : gig.ownerId.toString();
 
     // Emit real-time event to gig owner
     const io = req.app.get('io');
     if (io) {
-      io.emitToUser(gig.ownerId.toString(), 'bid:submitted', {
-        bid,
-        gigOwnerId: gig.ownerId.toString()
+      io.emitToUser(ownerIdForSocket, 'bid:submitted', {
+        bid: populatedBid,
+        gigOwnerId: ownerIdForSocket
       });
       // Also emit to all for notification count updates
       io.emit('bid:submitted', {
-        bid,
-        gigOwnerId: gig.ownerId.toString()
+        bid: populatedBid,
+        gigOwnerId: ownerIdForSocket
       });
-      console.log('📢 Emitted bid:submitted event for gig:', gig.title);
+      console.log('📢 Emitted bid:submitted event for gig:', gig.title, 'to owner:', ownerIdForSocket);
     }
 
-    res.status(201).json(bid);
+    res.status(201).json(populatedBid);
   } catch (error) {
+    console.error('Submit bid error:', error);
     res.status(500).json({ message: 'Server error', error: error.message });
   }
 };
@@ -82,6 +91,7 @@ export const getBidsForGig = async (req, res) => {
 
     const bids = await Bid.find({ gigId })
       .populate('freelancerId', 'name email')
+      .populate('gigId', 'title')
       .sort({ createdAt: -1 });
 
     res.json(bids);
@@ -150,6 +160,50 @@ export const hireBid = async (req, res) => {
   }
 };
 
+export const rejectBid = async (req, res) => {
+  try {
+    const { bidId } = req.params;
+
+    const bid = await Bid.findById(bidId).populate('gigId');
+    if (!bid) {
+      return res.status(404).json({ message: 'Bid not found' });
+    }
+
+    const gig = bid.gigId;
+
+    // Verify the user is the gig owner
+    if (gig.ownerId.toString() !== req.user.userId) {
+      return res.status(403).json({ message: 'Not authorized to reject this bid' });
+    }
+
+    if (bid.status === 'hired') {
+      return res.status(400).json({ message: 'Cannot reject a hired bid' });
+    }
+
+    if (bid.status === 'rejected') {
+      return res.status(400).json({ message: 'This bid has already been rejected' });
+    }
+
+    bid.status = 'rejected';
+    await bid.save();
+
+    // Emit real-time event
+    const io = req.app.get('io');
+    if (io) {
+      io.emit('bid:rejected', {
+        bidId: bid._id.toString(),
+        freelancerId: bid.freelancerId.toString(),
+        gigId: gig._id.toString()
+      });
+      console.log('📢 Emitted bid:rejected event');
+    }
+
+    res.json({ message: 'Bid rejected successfully', bid });
+  } catch (error) {
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+};
+
 export const getMyBids = async (req, res) => {
   try {
     const bids = await Bid.find({ freelancerId: req.user.userId })
@@ -173,7 +227,7 @@ export const counterOffer = async (req, res) => {
       return res.status(400).json({ message: 'Valid counter-offer price is required' });
     }
 
-    const bid = await Bid.findById(bidId).populate('gigId');
+    const bid = await Bid.findById(bidId).populate('gigId').populate('freelancerId', 'name email');
     if (!bid) {
       return res.status(404).json({ message: 'Bid not found' });
     }
@@ -193,20 +247,21 @@ export const counterOffer = async (req, res) => {
     await bid.save();
 
     // Populate for response
-    await bid.populate('freelancerId', 'name email');
-    await bid.populate('gigId', 'title');
+    const populatedBid = await Bid.findById(bid._id)
+      .populate('freelancerId', 'name email')
+      .populate('gigId', 'title ownerId');
 
     // Emit real-time event
     const io = req.app.get('io');
     if (io) {
       io.emit('bid:counter-offered', {
-        bid,
+        bid: populatedBid,
         freelancerId: bid.freelancerId._id.toString()
       });
       console.log('📢 Emitted bid:counter-offered event');
     }
 
-    res.json({ message: 'Counter-offer sent successfully', bid });
+    res.json({ message: 'Counter-offer sent successfully', bid: populatedBid });
   } catch (error) {
     res.status(500).json({ message: 'Server error', error: error.message });
   }

@@ -16,16 +16,23 @@ export default function MyGigsPage() {
     useEffect(() => {
         const fetchMyGigs = async () => {
             try {
-                const response = await api.get('/gigs');
-                const userGigs = response.data.filter(gig => gig.ownerId._id === user.id);
+                const response = await api.get('/gigs/all');
+                // Filter gigs created by current user
+                const userGigs = response.data.filter(gig => {
+                    if (!gig.ownerId) return false;
+                    const ownerId = gig.ownerId._id || gig.ownerId;
+                    return ownerId === user.id;
+                });
                 setMyGigs(userGigs);
             } catch (error) {
-                console.error('Failed to fetch gigs');
+                console.error('Failed to fetch gigs:', error);
             } finally {
                 setLoading(false);
             }
         };
-        fetchMyGigs();
+        if (user) {
+            fetchMyGigs();
+        }
     }, [user]);
 
     // Listen for real-time bid submissions and hires
@@ -176,10 +183,10 @@ export default function MyGigsPage() {
                                         {gig.title}
                                     </h3>
                                     <span className={`px-3 py-1 text-xs font-semibold rounded-full whitespace-nowrap ${gig.status === 'open'
-                                            ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400'
-                                            : gig.status === 'assigned'
-                                                ? 'bg-cyan-100 text-cyan-800 dark:bg-cyan-900/30 dark:text-cyan-400'
-                                                : 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300'
+                                        ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400'
+                                        : gig.status === 'assigned'
+                                            ? 'bg-cyan-100 text-cyan-800 dark:bg-cyan-900/30 dark:text-cyan-400'
+                                            : 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300'
                                         }`}>
                                         {gig.status}
                                     </span>

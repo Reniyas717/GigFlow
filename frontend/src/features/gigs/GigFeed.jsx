@@ -135,7 +135,7 @@ export default function GigFeed() {
                 {/* Posted By */}
                 <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 mb-4">
                   <User className="w-4 h-4" />
-                  <span>Posted by <span className="font-semibold">{gig.ownerId.name}</span></span>
+                  <span>Posted by <span className="font-semibold">{gig.ownerId?.name || 'Unknown'}</span></span>
                 </div>
 
                 {/* View Details Button */}

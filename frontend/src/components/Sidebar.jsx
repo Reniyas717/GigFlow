@@ -34,13 +34,25 @@ export default function Sidebar() {
     // Listen for new bids and increment counter
     useEffect(() => {
         if (socket && user) {
-            socket.on('bid:submitted', ({ gigOwnerId }) => {
-                if (gigOwnerId === user.id) {
-                    setUnreadBids(prev => prev + 1);
-                }
-            });
+            const handleBidSubmitted = ({ bid, gigOwnerId }) => {
+                console.log('🔔 Sidebar received bid:submitted', {
+                    gigOwnerId,
+                    userId: user.id,
+                    match: gigOwnerId === user.id,
+                    bid
+                });
 
-            return () => socket.off('bid:submitted');
+                if (gigOwnerId === user.id) {
+                    setUnreadBids(prev => {
+                        const newCount = prev + 1;
+                        console.log('📈 Incrementing badge:', prev, '→', newCount);
+                        return newCount;
+                    });
+                }
+            };
+
+            socket.on('bid:submitted', handleBidSubmitted);
+            return () => socket.off('bid:submitted', handleBidSubmitted);
         }
     }, [socket, user]);
 
