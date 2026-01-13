@@ -83,6 +83,13 @@ export const submitBid = async (req, res) => {
         bid: populatedBid,
         gigOwnerId: ownerIdForSocket
       });
+      // Broadcast position update to all users
+      io.emit('gig:positionsUpdate', {
+        gigId: gig._id.toString(),
+        positionsFilled,
+        positionsAvailable,
+        remainingPositions: positionsAvailable - positionsFilled
+      });
       console.log('📢 Emitted bid:submitted event for gig:', gig.title, 'to owner:', ownerIdForSocket);
     }
 
@@ -171,6 +178,13 @@ export const hireBid = async (req, res) => {
         rejectedBidders: allBids
           .filter(b => b.status === 'rejected')
           .map(b => b.freelancerId.toString())
+      });
+      // Broadcast updated positions
+      io.emit('gig:positionsUpdate', {
+        gigId: gig._id.toString(),
+        positionsFilled: gig.positionsFilled,
+        positionsAvailable: gig.positionsAvailable,
+        remainingPositions: gig.positionsAvailable - gig.positionsFilled
       });
       console.log('📢 Emitted bid:hired event for gig:', gig.title);
     }

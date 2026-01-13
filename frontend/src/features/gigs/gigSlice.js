@@ -36,6 +36,16 @@ const gigSlice = createSlice({
     clearError: (state) => {
       state.error = null
     },
+    updateGigPositions: (state, action) => {
+      const { gigId, positionsFilled, positionsAvailable } = action.payload;
+      
+      // Update in gigs array
+      const gigIndex = state.gigs.findIndex(g => g._id === gigId);
+      if (gigIndex !== -1) {
+        state.gigs[gigIndex].positionsFilled = positionsFilled;
+        state.gigs[gigIndex].positionsAvailable = positionsAvailable;
+      }
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -66,5 +76,5 @@ const gigSlice = createSlice({
   },
 })
 
-export const { clearError } = gigSlice.actions
+export const { clearError, updateGigPositions } = gigSlice.actions
 export default gigSlice.reducer
