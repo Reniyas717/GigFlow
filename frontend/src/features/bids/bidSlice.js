@@ -5,7 +5,7 @@ export const submitBid = createAsyncThunk(
   'bids/submitBid',
   async (bidData, { rejectWithValue }) => {
     try {
-      const response = await api.post('/bids', bidData)
+      const response = await api.post('/bids/submit', bidData)
       return response.data
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || 'Failed to submit bid')
@@ -17,7 +17,7 @@ export const fetchBidsForGig = createAsyncThunk(
   'bids/fetchBidsForGig',
   async (gigId, { rejectWithValue }) => {
     try {
-      const response = await api.get(`/bids/${gigId}`)
+      const response = await api.get(`/bids/gig/${gigId}`)
       return response.data
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || 'Failed to fetch bids')
@@ -29,7 +29,7 @@ export const hireBid = createAsyncThunk(
   'bids/hireBid',
   async (bidId, { rejectWithValue }) => {
     try {
-      const response = await api.patch(`/bids/${bidId}/hire`)
+      const response = await api.post(`/bids/${bidId}/hire`)
       return response.data
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || 'Failed to hire bid')

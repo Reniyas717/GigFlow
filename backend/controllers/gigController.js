@@ -75,3 +75,88 @@ export const getAllGigs = async (req, res) => {
     res.status(500).json({ message: 'Server error', error: error.message });
   }
 };
+
+export const assignAdmin = async (req, res) => {
+  try {
+    const { gigId } = req.params;
+    const { userId } = req.body;
+
+    if (!userId) {
+      return res.status(400).json({ message: 'User ID is required' });
+    }
+
+    const gig = await Gig.findById(gigId);
+    if (!gig) {
+      return res.status(404).json({ message: 'Gig not found' });
+    }
+
+    // Only owner can assign admins
+    if (gig.ownerId.toString() !== req.user.userId) {
+      return res.status(403).json({ message: 'Only gig owner can assign admins' });
+    }
+
+    // Check if user is already an admin
+    if (gig.admins && gig.admins.includes(userId)) {
+      return res.status(400).json({ message: 'User is already an admin' });
+    }
+
+    // Add admin
+    if (!gig.admins) {
+      gig.admins = [];
+    }
+    gig.admins.push(userId);
+    await gig.save();
+
+    res.json({ message: 'Admin assigned successfully', gig });
+  } catch (error) {
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+};
+
+export const removeAdmin = async (req, res) => {
+  try {
+    const { gigId } = req.params;
+    const { userId } = req.body;
+
+    if (!userId) {
+      return res.status(400).json({ message: 'User ID is required' });
+    }
+
+    const gig = await Gig.findById(gigId);
+    if (!gig) {
+      return res.status(404).json({ message: 'Gig not found' });
+    }
+
+    // Only owner can remove admins
+    if (gig.ownerId.toString() !== req.user.userId) {
+      return res.status(403).json({ message: 'Only gig owner can remove admins' });
+    }
+
+    // Remove admin
+    if (gig.admins) {
+      gig.admins = gig.admins.filter(id => id.toString() !== userId);
+    }
+    await gig.save();
+
+    res.json({ message: 'Admin removed successfully', gig });
+  } catch (error) {
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+};
+
+export const getGigById = async (req, res) => {
+  try {
+    const { gigId } = req.params;
+    const gig = await Gig.findById(gigId)
+      .populate('ownerId', 'name email')
+      .populate('admins', 'name email');
+    
+    if (!gig) {
+      return res.status(404).json({ message: 'Gig not found' });
+    }
+    
+    res.json(gig);
+  } catch (error) {
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+};

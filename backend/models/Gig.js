@@ -35,7 +35,12 @@ const gigSchema = new mongoose.Schema({
     type: Number,
     default: 0,
     min: 0
-  }
+  },
+  admins: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    default: []
+  }]
 }, { timestamps: true });
 
 export default mongoose.model('Gig', gigSchema);

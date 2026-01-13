@@ -103,14 +103,30 @@ export const submitBid = async (req, res) => {
 export const getBidsForGig = async (req, res) => {
   try {
     const { gigId } = req.params;
+    
+    console.log('Fetching bids for gigId:', gigId);
+    
+    const gig = await Gig.findById(gigId);
+    if (!gig) {
+      return res.status(404).json({ message: 'Gig not found' });
+    }
+
+    // Check if user is the gig owner or an admin
+    const isOwner = gig.ownerId.toString() === req.user.userId;
+    const isAdmin = gig.admins && gig.admins.some(id => id.toString() === req.user.userId);
+    
+    if (!isOwner && !isAdmin) {
+      return res.status(403).json({ message: 'Not authorized to view bids for this gig' });
+    }
 
     const bids = await Bid.find({ gigId })
-      .populate('freelancerId', 'name email')
-      .populate('gigId', 'title')
+      .populate('freelancerId', 'name email avatar skills')
       .sort({ createdAt: -1 });
 
+    console.log('Found bids:', bids.length);
     res.json(bids);
   } catch (error) {
+    console.error('Get bids error:', error);
     res.status(500).json({ message: 'Server error', error: error.message });
   }
 };
@@ -126,71 +142,122 @@ export const hireBid = async (req, res) => {
 
     const gig = bid.gigId;
 
-    // Verify the user is the gig owner
-    if (gig.ownerId.toString() !== req.user.userId) {
+    // Authorization check: Owner OR Admin can hire
+    const isOwner = gig.ownerId.toString() === req.user.userId;
+    const isAdmin = gig.admins && gig.admins.some(id => id.toString() === req.user.userId);
+    
+    if (!isOwner && !isAdmin) {
       return res.status(403).json({ message: 'Not authorized to hire for this gig' });
     }
 
-    if (bid.status === 'hired') {
-      return res.status(400).json({ message: 'This bid has already been hired' });
-    }
-
-    if (gig.status === 'assigned') {
-      return res.status(400).json({ message: 'This gig has already been assigned' });
-    }
-
-    // Reject all other bids for this gig
-    await Bid.updateMany(
-      { gigId: bid.gigId, _id: { $ne: bidId } },
-      { status: 'rejected' }
+    // ATOMIC CHECK: Try to increment positions if available
+    const gigUpdate = await Gig.findOneAndUpdate(
+      {
+        _id: gig._id,
+        $expr: { $lt: ['$positionsFilled', '$positionsAvailable'] }, // Use $expr for field comparison
+        status: { $ne: 'filled' }
+      },
+      {
+        $inc: { positionsFilled: 1 }
+      },
+      {
+        new: true,
+        runValidators: true
+      }
     );
 
-    bid.status = 'hired';
-    await bid.save();
+    // Position was already taken by another admin
+    if (!gigUpdate) {
+      return res.status(409).json({ 
+        message: 'All positions have been filled. Another admin just hired someone.',
+        conflict: true
+      });
+    }
 
-    // Increment positions filled
-    gig.positionsFilled = (gig.positionsFilled || 0) + 1;
+    // ATOMIC BID UPDATE: Only hire if still pending
+    const bidUpdate = await Bid.findOneAndUpdate(
+      {
+        _id: bidId,
+        status: 'pending'
+      },
+      {
+        $set: { 
+          status: 'hired',
+          hiredBy: req.user.userId,
+          hiredAt: new Date()
+        }
+      },
+      {
+        new: true
+      }
+    );
 
-    // Check if all positions are filled
-    if (gig.positionsFilled >= gig.positionsAvailable) {
-      gig.status = 'filled';
-      // Reject all remaining pending bids
+    // Bid was already hired or rejected by another admin
+    if (!bidUpdate) {
+      // ROLLBACK: Decrement position back
+      await Gig.findByIdAndUpdate(gig._id, {
+        $inc: { positionsFilled: -1 }
+      });
+      
+      return res.status(409).json({ 
+        message: 'This bid has already been processed by another admin.',
+        conflict: true
+      });
+    }
+
+    // Check if all positions are now filled
+    if (gigUpdate.positionsFilled >= gigUpdate.positionsAvailable) {
+      await Gig.findByIdAndUpdate(gig._id, {
+        $set: { status: 'filled' }
+      });
+      
+      // Reject all remaining pending bids atomically
       await Bid.updateMany(
-        { gigId: bid.gigId, status: 'pending' },
-        { status: 'rejected' }
+        { 
+          gigId: gig._id, 
+          status: 'pending'
+        },
+        { 
+          $set: { 
+            status: 'rejected',
+            rejectedReason: 'All positions filled'
+          }
+        }
       );
     }
-    // Keep status as 'open' if there are still positions available
 
-    await gig.save();
-
-    // Emit real-time event to all affected users
+    // Emit real-time events
     const io = req.app.get('io');
     if (io) {
-      // Get all bids for this gig to notify rejected bidders
-      const allBids = await Bid.find({ gigId: bid.gigId });
+      const allBids = await Bid.find({ gigId: gig._id });
 
       io.emit('bid:hired', {
-        bidId: bid._id.toString(),
+        bidId: bidUpdate._id.toString(),
         gigId: gig._id.toString(),
-        freelancerId: bid.freelancerId.toString(),
+        freelancerId: bidUpdate.freelancerId.toString(),
         gigOwnerId: gig.ownerId.toString(),
+        hiredBy: req.user.userId,
         rejectedBidders: allBids
           .filter(b => b.status === 'rejected')
           .map(b => b.freelancerId.toString())
       });
-      // Broadcast updated positions
+
       io.emit('gig:positionsUpdate', {
         gigId: gig._id.toString(),
-        positionsFilled: gig.positionsFilled,
-        positionsAvailable: gig.positionsAvailable,
-        remainingPositions: gig.positionsAvailable - gig.positionsFilled
+        positionsFilled: gigUpdate.positionsFilled,
+        positionsAvailable: gigUpdate.positionsAvailable,
+        remainingPositions: gigUpdate.positionsAvailable - gigUpdate.positionsFilled,
+        status: gigUpdate.status
       });
-      console.log('📢 Emitted bid:hired event for gig:', gig.title);
     }
 
-    res.json({ message: 'Bid hired successfully', bid });
+    res.json({ 
+      message: 'Bid hired successfully', 
+      bid: bidUpdate,
+      remainingPositions: gigUpdate.positionsAvailable - gigUpdate.positionsFilled
+    });
   } catch (error) {
+    console.error('Hire bid error:', error);
     res.status(500).json({ message: 'Server error', error: error.message });
   }
 };
@@ -327,32 +394,45 @@ export const acceptCounterOffer = async (req, res) => {
 
     // Reject other bids
     await Bid.updateMany(
-      { gigId: bid.gigId, _id: { $ne: bidId } },
-      { status: 'rejected' }
+      { gigId: bid.gigId, _id: { $ne: bidId }, status: 'pending' },
+      { $set: { status: 'rejected', rejectedReason: 'Replaced by counter-offer acceptance' } }
     );
 
-    // Update gig status
-    const gig = bid.gigId;
-    gig.status = 'assigned';
-    await gig.save();
+    // Update gig positions if necessary
+    const gigUpdate = await Gig.findById(bid.gigId);
+    if (gigUpdate) {
+      const positionsFilled = gigUpdate.positionsFilled || 0;
+      const positionsAvailable = gigUpdate.positionsAvailable || 1;
 
-    // Emit real-time event
-    const io = req.app.get('io');
-    if (io) {
-      const allBids = await Bid.find({ gigId: bid.gigId });
-      io.emit('bid:hired', {
-        bidId: bid._id.toString(),
-        gigId: gig._id.toString(),
-        freelancerId: bid.freelancerId.toString(),
-        gigOwnerId: gig.ownerId.toString(),
-        rejectedBidders: allBids
-          .filter(b => b.status === 'rejected')
-          .map(b => b.freelancerId.toString())
-      });
-      console.log('📢 Emitted bid:hired event after counter-offer acceptance');
+      if (positionsFilled < positionsAvailable) {
+        await Gig.findByIdAndUpdate(bid.gigId, { $inc: { positionsFilled: 1 } });
+      }
     }
 
-    res.json({ message: 'Counter-offer accepted and bid hired successfully', bid });
+    // Emit real-time events
+    const io = req.app.get('io');
+    if (io) {
+      io.emit('bid:accepted', {
+        bidId: bid._id.toString(),
+        gigId: bid.gigId.toString(),
+        freelancerId: bid.freelancerId.toString(),
+        gigOwnerId: bid.gigId.ownerId.toString()
+      });
+
+      // Update gig positions
+      const updatedGig = await Gig.findById(bid.gigId);
+      if (updatedGig) {
+        io.emit('gig:positionsUpdate', {
+          gigId: updatedGig._id.toString(),
+          positionsFilled: updatedGig.positionsFilled,
+          positionsAvailable: updatedGig.positionsAvailable,
+          remainingPositions: updatedGig.positionsAvailable - updatedGig.positionsFilled,
+          status: updatedGig.status
+        });
+      }
+    }
+
+    res.json({ message: 'Counter-offer accepted and bid hired', bid });
   } catch (error) {
     res.status(500).json({ message: 'Server error', error: error.message });
   }
