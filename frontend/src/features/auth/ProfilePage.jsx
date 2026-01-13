@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { User, Mail, Shield, Edit2, Save, X } from 'lucide-react';
 import { setUser } from '../auth/authSlice';
@@ -14,6 +14,11 @@ export default function ProfilePage() {
     });
     const [loading, setLoading] = useState(false);
     const [message, setMessage] = useState({ type: '', text: '' });
+    const [stats, setStats] = useState({
+        gigsCreated: 0,
+        bidsSubmitted: 0,
+        projectsCompleted: 0
+    });
 
     const handleEdit = () => {
         setIsEditing(true);
@@ -52,6 +57,35 @@ export default function ProfilePage() {
         }
     };
 
+    // Fetch statistics
+    useEffect(() => {
+        const fetchStats = async () => {
+            try {
+                const [gigsRes, bidsRes] = await Promise.all([
+                    api.get('/gigs'),
+                    api.get('/bids/my-bids')
+                ]);
+
+                const userGigs = gigsRes.data.filter(g =>
+                    (g.ownerId._id && g.ownerId._id === user.id) || g.ownerId === user.id
+                );
+                const userBids = bidsRes.data;
+
+                setStats({
+                    gigsCreated: userGigs.length,
+                    bidsSubmitted: userBids.length,
+                    projectsCompleted: userGigs.filter(g => g.status === 'assigned').length
+                });
+            } catch (error) {
+                console.error('Failed to fetch stats');
+            }
+        };
+
+        if (user) {
+            fetchStats();
+        }
+    }, [user]);
+
     return (
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
             {/* Header */}
@@ -82,12 +116,12 @@ export default function ProfilePage() {
                 {/* Message */}
                 {message.text && (
                     <div className={`mb-6 p-4 rounded-lg border-l-4 ${message.type === 'success'
-                            ? 'bg-green-50 dark:bg-green-900/20 border-green-500'
-                            : 'bg-red-50 dark:bg-red-900/20 border-red-500'
+                        ? 'bg-green-50 dark:bg-green-900/20 border-green-500'
+                        : 'bg-red-50 dark:bg-red-900/20 border-red-500'
                         }`}>
                         <p className={`font-medium ${message.type === 'success'
-                                ? 'text-green-700 dark:text-green-400'
-                                : 'text-red-700 dark:text-red-400'
+                            ? 'text-green-700 dark:text-green-400'
+                            : 'text-red-700 dark:text-red-400'
                             }`}>
                             {message.text}
                         </p>
@@ -191,15 +225,15 @@ export default function ProfilePage() {
                 </h3>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                     <div className="text-center">
-                        <p className="text-3xl font-bold text-cyan-600 dark:text-cyan-400">0</p>
+                        <p className="text-3xl font-bold text-cyan-600 dark:text-cyan-400">{stats.gigsCreated}</p>
                         <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">Gigs Created</p>
                     </div>
                     <div className="text-center">
-                        <p className="text-3xl font-bold text-green-600 dark:text-green-400">0</p>
+                        <p className="text-3xl font-bold text-green-600 dark:text-green-400">{stats.bidsSubmitted}</p>
                         <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">Bids Submitted</p>
                     </div>
                     <div className="text-center">
-                        <p className="text-3xl font-bold text-slate-700 dark:text-slate-400">0</p>
+                        <p className="text-3xl font-bold text-slate-700 dark:text-slate-400">{stats.projectsCompleted}</p>
                         <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">Projects Completed</p>
                     </div>
                 </div>

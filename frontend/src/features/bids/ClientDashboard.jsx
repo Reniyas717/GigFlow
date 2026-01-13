@@ -2,16 +2,22 @@ import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchBidsForGig, hireBid } from './bidSlice';
 import api from '../../utils/api';
+import { useSocket } from '../../context/SocketContext';
+import { useToast, ToastContainer } from '../../components/Toast';
 import { Briefcase, DollarSign, Users, TrendingUp, Eye, CheckCircle, Clock, XCircle } from 'lucide-react';
 
 export default function ClientDashboard() {
   const [myGigs, setMyGigs] = useState([]);
   const [selectedGig, setSelectedGig] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [counterOfferModal, setCounterOfferModal] = useState({ open: false, bidId: null });
+  const [counterOfferData, setCounterOfferData] = useState({ price: '', message: '' });
 
   const dispatch = useDispatch();
   const { bids, loading: bidLoading, error } = useSelector((state) => state.bids);
   const { user } = useSelector((state) => state.auth);
+  const socket = useSocket();
+  const { toasts, addToast, removeToast } = useToast();
 
   useEffect(() => {
     const fetchMyGigs = async () => {
@@ -27,6 +33,48 @@ export default function ClientDashboard() {
     };
     fetchMyGigs();
   }, [user]);
+
+  // Listen for real-time bid submissions
+  useEffect(() => {
+    if (socket && user) {
+      socket.on('bid:submitted', ({ bid, gigOwnerId }) => {
+        if (gigOwnerId === user.id) {
+          console.log('📢 New bid received:', bid);
+          // Refresh gigs to update bid count
+          const fetchGigs = async () => {
+            const response = await api.get('/gigs');
+            const userGigs = response.data.filter(gig => gig.ownerId._id === user.id);
+            setMyGigs(userGigs);
+          };
+          fetchGigs();
+
+          // If viewing this gig's bids, refresh them
+          if (selectedGig && bid.gigId._id === selectedGig._id) {
+            dispatch(fetchBidsForGig(selectedGig._id));
+          }
+
+          addToast(`New bid received on ${bid.gigId.title}!`, 'info');
+        }
+      });
+
+      socket.on('bid:hired', ({ gigOwnerId }) => {
+        if (gigOwnerId === user.id) {
+          // Refresh gigs to update status
+          const fetchGigs = async () => {
+            const response = await api.get('/gigs');
+            const userGigs = response.data.filter(gig => gig.ownerId._id === user.id);
+            setMyGigs(userGigs);
+          };
+          fetchGigs();
+        }
+      });
+
+      return () => {
+        socket.off('bid:submitted');
+        socket.off('bid:hired');
+      };
+    }
+  }, [socket, user, selectedGig, dispatch, addToast]);
 
   const handleViewBids = (gig) => {
     setSelectedGig(gig);
@@ -50,6 +98,32 @@ export default function ClientDashboard() {
     }
   };
 
+  const handleCounterOffer = (bidId, currentPrice) => {
+    setCounterOfferModal({ open: true, bidId });
+    setCounterOfferData({ price: currentPrice, message: '' });
+  };
+
+  const submitCounterOffer = async () => {
+    if (!counterOfferData.price || counterOfferData.price <= 0) {
+      alert('Please enter a valid price');
+      return;
+    }
+
+    try {
+      await api.patch(`/bids/${counterOfferModal.bidId}/counter-offer`, counterOfferData);
+      addToast('Counter-offer sent successfully!', 'success');
+      setCounterOfferModal({ open: false, bidId: null });
+      setCounterOfferData({ price: '', message: '' });
+
+      // Refresh bids
+      if (selectedGig) {
+        dispatch(fetchBidsForGig(selectedGig._id));
+      }
+    } catch (error) {
+      alert(error.response?.data?.message || 'Failed to send counter-offer');
+    }
+  };
+
   // Calculate stats
   const stats = {
     totalGigs: myGigs.length,
@@ -70,227 +144,297 @@ export default function ClientDashboard() {
   }
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      {/* Header */}
-      <div className="mb-8">
-        <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-2">
-          My Gigs Dashboard
-        </h1>
-        <p className="text-gray-600 dark:text-gray-400">
-          Manage your projects and review bids from talented freelancers
-        </p>
-      </div>
-
-      {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-        <div className="glass rounded-xl p-6 border border-gray-200 dark:border-slate-700">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Total Gigs</p>
-              <p className="text-3xl font-bold text-gray-900 dark:text-white mt-2">{stats.totalGigs}</p>
-            </div>
-            <div className="p-3 bg-slate-700 dark:bg-cyan-500/20 rounded-lg">
-              <Briefcase className="w-6 h-6 text-white dark:text-cyan-400" />
-            </div>
-          </div>
-        </div>
-
-        <div className="glass rounded-xl p-6 border border-gray-200 dark:border-slate-700">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Open Gigs</p>
-              <p className="text-3xl font-bold text-green-600 dark:text-green-400 mt-2">{stats.openGigs}</p>
-            </div>
-            <div className="p-3 bg-green-600 dark:bg-green-500/20 rounded-lg">
-              <TrendingUp className="w-6 h-6 text-white dark:text-green-400" />
-            </div>
-          </div>
-        </div>
-
-        <div className="glass rounded-xl p-6 border border-gray-200 dark:border-slate-700">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Closed Gigs</p>
-              <p className="text-3xl font-bold text-gray-600 dark:text-gray-400 mt-2">{stats.closedGigs}</p>
-            </div>
-            <div className="p-3 bg-gray-600 dark:bg-gray-500/20 rounded-lg">
-              <CheckCircle className="w-6 h-6 text-white dark:text-gray-400" />
-            </div>
-          </div>
-        </div>
-
-        <div className="glass rounded-xl p-6 border border-gray-200 dark:border-slate-700">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Total Budget</p>
-              <p className="text-3xl font-bold text-cyan-600 dark:text-cyan-400 mt-2">${stats.totalBudget}</p>
-            </div>
-            <div className="p-3 bg-cyan-600 dark:bg-cyan-500/20 rounded-lg">
-              <DollarSign className="w-6 h-6 text-white dark:text-cyan-400" />
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {myGigs.length === 0 ? (
-        <div className="glass rounded-2xl p-12 text-center border border-gray-200 dark:border-slate-700">
-          <Briefcase className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-          <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
-            No gigs yet
-          </h3>
-          <p className="text-gray-600 dark:text-gray-400 mb-6">
-            Create your first gig to start receiving bids from freelancers
+    <>
+      <ToastContainer toasts={toasts} removeToast={removeToast} />
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Header */}
+        <div className="mb-8">
+          <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-2">
+            My Gigs Dashboard
+          </h1>
+          <p className="text-gray-600 dark:text-gray-400">
+            Manage your projects and review bids from talented freelancers
           </p>
-          <a
-            href="/create-gig"
-            className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-slate-800 to-cyan-500 hover:from-slate-900 hover:to-cyan-600 text-white font-semibold rounded-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all"
-          >
-            <Briefcase size={20} />
-            Create Your First Gig
-          </a>
         </div>
-      ) : (
-        <div className="grid gap-6 lg:grid-cols-2">
-          {/* Your Gigs */}
-          <div>
-            <div className="flex items-center gap-2 mb-4">
-              <Briefcase className="w-5 h-5 text-slate-700 dark:text-cyan-400" />
-              <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Your Gigs</h2>
+
+        {/* Stats Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+          <div className="glass rounded-xl p-6 border border-gray-200 dark:border-slate-700">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Total Gigs</p>
+                <p className="text-3xl font-bold text-gray-900 dark:text-white mt-2">{stats.totalGigs}</p>
+              </div>
+              <div className="p-3 bg-slate-700 dark:bg-cyan-500/20 rounded-lg">
+                <Briefcase className="w-6 h-6 text-white dark:text-cyan-400" />
+              </div>
             </div>
-            <div className="space-y-4">
-              {myGigs.map((gig) => (
-                <div
-                  key={gig._id}
-                  onClick={() => handleViewBids(gig)}
-                  className={`glass rounded-xl p-6 border cursor-pointer transition-all transform hover:scale-105 hover:shadow-xl ${selectedGig?._id === gig._id
+          </div>
+
+          <div className="glass rounded-xl p-6 border border-gray-200 dark:border-slate-700">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Open Gigs</p>
+                <p className="text-3xl font-bold text-green-600 dark:text-green-400 mt-2">{stats.openGigs}</p>
+              </div>
+              <div className="p-3 bg-green-600 dark:bg-green-500/20 rounded-lg">
+                <TrendingUp className="w-6 h-6 text-white dark:text-green-400" />
+              </div>
+            </div>
+          </div>
+
+          <div className="glass rounded-xl p-6 border border-gray-200 dark:border-slate-700">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Closed Gigs</p>
+                <p className="text-3xl font-bold text-gray-600 dark:text-gray-400 mt-2">{stats.closedGigs}</p>
+              </div>
+              <div className="p-3 bg-gray-600 dark:bg-gray-500/20 rounded-lg">
+                <CheckCircle className="w-6 h-6 text-white dark:text-gray-400" />
+              </div>
+            </div>
+          </div>
+
+          <div className="glass rounded-xl p-6 border border-gray-200 dark:border-slate-700">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Total Budget</p>
+                <p className="text-3xl font-bold text-cyan-600 dark:text-cyan-400 mt-2">${stats.totalBudget}</p>
+              </div>
+              <div className="p-3 bg-cyan-600 dark:bg-cyan-500/20 rounded-lg">
+                <DollarSign className="w-6 h-6 text-white dark:text-cyan-400" />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {myGigs.length === 0 ? (
+          <div className="glass rounded-2xl p-12 text-center border border-gray-200 dark:border-slate-700">
+            <Briefcase className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+            <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
+              No gigs yet
+            </h3>
+            <p className="text-gray-600 dark:text-gray-400 mb-6">
+              Create your first gig to start receiving bids from freelancers
+            </p>
+            <a
+              href="/create-gig"
+              className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-slate-800 to-cyan-500 hover:from-slate-900 hover:to-cyan-600 text-white font-semibold rounded-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all"
+            >
+              <Briefcase size={20} />
+              Create Your First Gig
+            </a>
+          </div>
+        ) : (
+          <div className="grid gap-6 lg:grid-cols-2">
+            {/* Your Gigs */}
+            <div>
+              <div className="flex items-center gap-2 mb-4">
+                <Briefcase className="w-5 h-5 text-slate-700 dark:text-cyan-400" />
+                <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Your Gigs</h2>
+              </div>
+              <div className="space-y-4">
+                {myGigs.map((gig) => (
+                  <div
+                    key={gig._id}
+                    onClick={() => handleViewBids(gig)}
+                    className={`glass rounded-xl p-6 border cursor-pointer transition-all transform hover:scale-105 hover:shadow-xl ${selectedGig?._id === gig._id
                       ? 'border-cyan-500 dark:border-cyan-400 shadow-lg'
                       : 'border-gray-200 dark:border-slate-700'
-                    }`}
-                >
-                  <div className="flex items-start justify-between mb-3">
-                    <h3 className="font-bold text-lg text-gray-900 dark:text-white">{gig.title}</h3>
-                    <span className={`px-3 py-1 text-xs font-semibold rounded-full ${gig.status === 'open'
+                      }`}
+                  >
+                    <div className="flex items-start justify-between mb-3">
+                      <h3 className="font-bold text-lg text-gray-900 dark:text-white">{gig.title}</h3>
+                      <span className={`px-3 py-1 text-xs font-semibold rounded-full ${gig.status === 'open'
                         ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400'
                         : 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300'
-                      }`}>
-                      {gig.status}
-                    </span>
-                  </div>
-                  <p className="text-sm text-gray-600 dark:text-gray-400 mb-4 line-clamp-2">
-                    {gig.description}
-                  </p>
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <DollarSign className="w-4 h-4 text-green-600 dark:text-green-400" />
-                      <span className="text-xl font-bold text-green-600 dark:text-green-400">
-                        ${gig.budget}
+                        }`}>
+                        {gig.status}
                       </span>
                     </div>
-                    <button className="flex items-center gap-1 text-sm text-cyan-600 dark:text-cyan-400 hover:underline">
-                      <Eye size={16} />
-                      View Bids
-                    </button>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Bids Section */}
-          <div>
-            <div className="flex items-center gap-2 mb-4">
-              <Users className="w-5 h-5 text-slate-700 dark:text-cyan-400" />
-              <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
-                {selectedGig ? `Bids for "${selectedGig.title}"` : 'Select a gig to view bids'}
-              </h2>
-            </div>
-
-            {error && (
-              <div className="mb-4 p-4 bg-red-50 dark:bg-red-900/20 border-l-4 border-red-500 rounded-lg">
-                <p className="text-red-700 dark:text-red-400 font-medium">{error}</p>
-              </div>
-            )}
-
-            {bidLoading ? (
-              <div className="glass rounded-xl p-12 text-center border border-gray-200 dark:border-slate-700">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-cyan-500 mx-auto mb-4"></div>
-                <p className="text-gray-600 dark:text-gray-400">Loading bids...</p>
-              </div>
-            ) : selectedGig ? (
-              bids.length === 0 ? (
-                <div className="glass rounded-xl p-12 text-center border border-gray-200 dark:border-slate-700">
-                  <Clock className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-                  <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
-                    No bids yet
-                  </h3>
-                  <p className="text-gray-600 dark:text-gray-400">
-                    Freelancers will start bidding on your gig soon
-                  </p>
-                </div>
-              ) : (
-                <div className="space-y-4">
-                  {bids.map((bid) => (
-                    <div key={bid._id} className="glass rounded-xl p-6 border border-gray-200 dark:border-slate-700">
-                      <div className="flex justify-between items-start mb-4">
-                        <div className="flex items-start gap-3">
-                          <div className="w-12 h-12 bg-gradient-to-br from-slate-700 to-cyan-500 rounded-full flex items-center justify-center text-white font-bold text-lg">
-                            {bid.freelancerId.name.charAt(0).toUpperCase()}
-                          </div>
-                          <div>
-                            <p className="font-bold text-gray-900 dark:text-white">{bid.freelancerId.name}</p>
-                            <p className="text-sm text-gray-600 dark:text-gray-400">{bid.freelancerId.email}</p>
-                          </div>
-                        </div>
-                        <div className="text-right">
-                          <p className="text-sm text-gray-600 dark:text-gray-400">Bid Amount</p>
-                          <p className="text-2xl font-bold text-green-600 dark:text-green-400">${bid.price}</p>
-                        </div>
+                    <p className="text-sm text-gray-600 dark:text-gray-400 mb-4 line-clamp-2">
+                      {gig.description}
+                    </p>
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <DollarSign className="w-4 h-4 text-green-600 dark:text-green-400" />
+                        <span className="text-xl font-bold text-green-600 dark:text-green-400">
+                          ${gig.budget}
+                        </span>
                       </div>
+                      <button className="flex items-center gap-1 text-sm text-cyan-600 dark:text-cyan-400 hover:underline">
+                        <Eye size={16} />
+                        View Bids
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
 
-                      <p className="text-gray-700 dark:text-gray-300 mb-4 bg-gray-50 dark:bg-slate-700/50 p-3 rounded-lg">
-                        {bid.message}
-                      </p>
+            {/* Bids Section */}
+            <div>
+              <div className="flex items-center gap-2 mb-4">
+                <Users className="w-5 h-5 text-slate-700 dark:text-cyan-400" />
+                <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
+                  {selectedGig ? `Bids for "${selectedGig.title}"` : 'Select a gig to view bids'}
+                </h2>
+              </div>
 
-                      <div className="flex justify-between items-center">
-                        <span className={`px-3 py-1 text-xs font-semibold rounded-full flex items-center gap-1 ${bid.status === 'pending'
+              {error && (
+                <div className="mb-4 p-4 bg-red-50 dark:bg-red-900/20 border-l-4 border-red-500 rounded-lg">
+                  <p className="text-red-700 dark:text-red-400 font-medium">{error}</p>
+                </div>
+              )}
+
+              {bidLoading ? (
+                <div className="glass rounded-xl p-12 text-center border border-gray-200 dark:border-slate-700">
+                  <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-cyan-500 mx-auto mb-4"></div>
+                  <p className="text-gray-600 dark:text-gray-400">Loading bids...</p>
+                </div>
+              ) : selectedGig ? (
+                bids.length === 0 ? (
+                  <div className="glass rounded-xl p-12 text-center border border-gray-200 dark:border-slate-700">
+                    <Clock className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+                    <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
+                      No bids yet
+                    </h3>
+                    <p className="text-gray-600 dark:text-gray-400">
+                      Freelancers will start bidding on your gig soon
+                    </p>
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    {bids.map((bid) => (
+                      <div key={bid._id} className="glass rounded-xl p-6 border border-gray-200 dark:border-slate-700">
+                        <div className="flex justify-between items-start mb-4">
+                          <div className="flex items-start gap-3">
+                            <div className="w-12 h-12 bg-gradient-to-br from-slate-700 to-cyan-500 rounded-full flex items-center justify-center text-white font-bold text-lg">
+                              {bid.freelancerId.name.charAt(0).toUpperCase()}
+                            </div>
+                            <div>
+                              <p className="font-bold text-gray-900 dark:text-white">{bid.freelancerId.name}</p>
+                              <p className="text-sm text-gray-600 dark:text-gray-400">{bid.freelancerId.email}</p>
+                            </div>
+                          </div>
+                          <div className="text-right">
+                            <p className="text-sm text-gray-600 dark:text-gray-400">Bid Amount</p>
+                            <p className="text-2xl font-bold text-green-600 dark:text-green-400">${bid.price}</p>
+                          </div>
+                        </div>
+
+                        <p className="text-gray-700 dark:text-gray-300 mb-4 bg-gray-50 dark:bg-slate-700/50 p-3 rounded-lg">
+                          {bid.message}
+                        </p>
+
+                        <div className="flex justify-between items-center">
+                          <span className={`px-3 py-1 text-xs font-semibold rounded-full flex items-center gap-1 ${bid.status === 'pending'
                             ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400'
                             : bid.status === 'hired'
                               ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400'
                               : 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400'
-                          }`}>
-                          {bid.status === 'pending' && <Clock size={12} />}
-                          {bid.status === 'hired' && <CheckCircle size={12} />}
-                          {bid.status === 'rejected' && <XCircle size={12} />}
-                          {bid.status}
-                        </span>
-                        {bid.status === 'pending' && selectedGig.status === 'open' && (
-                          <button
-                            onClick={() => handleHire(bid._id)}
-                            className="px-6 py-2 bg-gradient-to-r from-slate-800 to-cyan-500 hover:from-slate-900 hover:to-cyan-600 text-white font-semibold rounded-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all"
-                          >
-                            Hire Freelancer
-                          </button>
-                        )}
+                            }`}>
+                            {bid.status === 'pending' && <Clock size={12} />}
+                            {bid.status === 'hired' && <CheckCircle size={12} />}
+                            {bid.status === 'rejected' && <XCircle size={12} />}
+                            {bid.status}
+                          </span>
+                          {bid.status === 'pending' && selectedGig.status === 'open' && (
+                            <div className="flex gap-2">
+                              <button
+                                onClick={() => handleCounterOffer(bid._id, bid.price)}
+                                className="px-4 py-2 bg-yellow-600 hover:bg-yellow-700 text-white font-semibold rounded-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all"
+                              >
+                                Counter-Offer
+                              </button>
+                              <button
+                                onClick={() => handleHire(bid._id)}
+                                className="px-6 py-2 bg-gradient-to-r from-slate-800 to-cyan-500 hover:from-slate-900 hover:to-cyan-600 text-white font-semibold rounded-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all"
+                              >
+                                Hire Freelancer
+                              </button>
+                            </div>
+                          )}
+                          {bid.status === 'counter-offered' && (
+                            <span className="px-3 py-1 text-xs font-semibold rounded-full bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-400">
+                              Counter-offer sent: ${bid.counterOffer?.price}
+                            </span>
+                          )}
+                        </div>
                       </div>
-                    </div>
-                  ))}
+                    ))}
+                  </div>
+                )
+              ) : (
+                <div className="glass rounded-xl p-12 text-center border border-gray-200 dark:border-slate-700">
+                  <Eye className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+                  <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
+                    Select a gig
+                  </h3>
+                  <p className="text-gray-600 dark:text-gray-400">
+                    Click on any gig to view its bids
+                  </p>
                 </div>
-              )
-            ) : (
-              <div className="glass rounded-xl p-12 text-center border border-gray-200 dark:border-slate-700">
-                <Eye className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-                <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
-                  Select a gig
-                </h3>
-                <p className="text-gray-600 dark:text-gray-400">
-                  Click on any gig to view its bids
-                </p>
+              )}
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Counter-Offer Modal */}
+      {counterOfferModal.open && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="glass rounded-2xl p-8 max-w-md w-full mx-4 border border-gray-200 dark:border-slate-700">
+            <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">
+              Send Counter-Offer
+            </h3>
+
+            <div className="space-y-4 mb-6">
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                  Counter-Offer Price ($)
+                </label>
+                <input
+                  type="number"
+                  value={counterOfferData.price}
+                  onChange={(e) => setCounterOfferData({ ...counterOfferData, price: e.target.value })}
+                  className="w-full px-4 py-3 bg-white dark:bg-slate-700 border-2 border-gray-200 dark:border-slate-600 rounded-lg focus:outline-none focus:border-slate-700 dark:focus:border-cyan-400 text-gray-900 dark:text-white"
+                  placeholder="Enter your counter-offer"
+                />
               </div>
-            )}
+
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                  Message (Optional)
+                </label>
+                <textarea
+                  value={counterOfferData.message}
+                  onChange={(e) => setCounterOfferData({ ...counterOfferData, message: e.target.value })}
+                  className="w-full px-4 py-3 bg-white dark:bg-slate-700 border-2 border-gray-200 dark:border-slate-600 rounded-lg focus:outline-none focus:border-slate-700 dark:focus:border-cyan-400 text-gray-900 dark:text-white resize-none"
+                  rows="3"
+                  placeholder="Explain your counter-offer..."
+                />
+              </div>
+            </div>
+
+            <div className="flex gap-3">
+              <button
+                onClick={submitCounterOffer}
+                className="flex-1 px-6 py-3 bg-yellow-600 hover:bg-yellow-700 text-white font-semibold rounded-lg shadow-lg hover:shadow-xl transition-all"
+              >
+                Send Counter-Offer
+              </button>
+              <button
+                onClick={() => setCounterOfferModal({ open: false, bidId: null })}
+                className="px-6 py-3 bg-gray-200 dark:bg-slate-700 hover:bg-gray-300 dark:hover:bg-slate-600 text-gray-900 dark:text-white font-semibold rounded-lg transition-all"
+              >
+                Cancel
+              </button>
+            </div>
           </div>
         </div>
       )}
-    </div>
+    </>
   );
 }
 

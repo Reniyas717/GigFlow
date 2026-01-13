@@ -1,5 +1,7 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
+import { useSelector } from 'react-redux';
+import { useSocket } from '../context/SocketContext';
 import {
     LayoutDashboard,
     Briefcase,
@@ -13,7 +15,10 @@ import {
 
 export default function Sidebar() {
     const [isCollapsed, setIsCollapsed] = useState(false);
+    const [unreadBids, setUnreadBids] = useState(0);
     const location = useLocation();
+    const { user } = useSelector((state) => state.auth);
+    const socket = useSocket();
 
     const menuItems = [
         { icon: <LayoutDashboard size={20} />, label: 'Dashboard', path: '/dashboard' },
@@ -25,6 +30,26 @@ export default function Sidebar() {
     ];
 
     const isActive = (path) => location.pathname === path;
+
+    // Listen for new bids and increment counter
+    useEffect(() => {
+        if (socket && user) {
+            socket.on('bid:submitted', ({ gigOwnerId }) => {
+                if (gigOwnerId === user.id) {
+                    setUnreadBids(prev => prev + 1);
+                }
+            });
+
+            return () => socket.off('bid:submitted');
+        }
+    }, [socket, user]);
+
+    // Clear badge when visiting dashboard
+    useEffect(() => {
+        if (location.pathname === '/dashboard') {
+            setUnreadBids(0);
+        }
+    }, [location.pathname]);
 
     return (
         <aside
@@ -46,14 +71,20 @@ export default function Sidebar() {
                         key={index}
                         to={item.path}
                         className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 ${isActive(item.path)
-                                ? 'bg-slate-700 text-white shadow-lg'
-                                : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-700'
+                            ? 'bg-slate-700 text-white shadow-lg'
+                            : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-700'
                             }`}
                         title={isCollapsed ? item.label : ''}
                     >
                         <span className="flex-shrink-0">{item.icon}</span>
                         {!isCollapsed && (
-                            <span className="font-medium whitespace-nowrap">{item.label}</span>
+                            <span className="font-medium whitespace-nowrap flex-1">{item.label}</span>
+                        )}
+                        {/* Notification Badge for Dashboard */}
+                        {item.path === '/dashboard' && unreadBids > 0 && (
+                            <span className="ml-auto px-2 py-1 text-xs bg-red-500 text-white rounded-full font-bold min-w-[20px] text-center">
+                                {unreadBids}
+                            </span>
                         )}
                     </Link>
                 ))}

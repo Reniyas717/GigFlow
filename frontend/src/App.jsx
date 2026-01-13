@@ -2,6 +2,7 @@ import { Routes, Route } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { useEffect } from 'react';
 import { ThemeProvider } from './context/ThemeContext';
+import { SocketProvider } from './context/SocketContext';
 import { loadUser } from './features/auth/authSlice';
 import Navbar from './components/Navbar';
 import Layout from './components/Layout';
@@ -28,107 +29,109 @@ function App() {
 
   return (
     <ThemeProvider>
-      <div className="min-h-screen">
-        <Routes>
-          {/* Public Routes - No Navbar */}
-          <Route path="/" element={<LandingPage />} />
-          <Route path="/register" element={<RegisterPage />} />
-          <Route path="/login" element={<LoginPage />} />
+      <SocketProvider>
+        <div className="min-h-screen">
+          <Routes>
+            {/* Public Routes - No Navbar */}
+            <Route path="/" element={<LandingPage />} />
+            <Route path="/register" element={<RegisterPage />} />
+            <Route path="/login" element={<LoginPage />} />
 
-          {/* Protected Routes - With Navbar and Sidebar */}
-          <Route
-            path="/browse"
-            element={
-              <ProtectedRoute>
-                <>
-                  <Navbar />
-                  <Layout>
-                    <GigFeed />
-                  </Layout>
-                </>
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/gigs/:gigId"
-            element={
-              <ProtectedRoute>
-                <>
-                  <Navbar />
-                  <Layout>
-                    <GigDetailPage />
-                  </Layout>
-                </>
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/create-gig"
-            element={
-              <ProtectedRoute>
-                <>
-                  <Navbar />
-                  <Layout>
-                    <CreateGigPage />
-                  </Layout>
-                </>
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/dashboard"
-            element={
-              <ProtectedRoute>
-                <>
-                  <Navbar />
-                  <Layout>
-                    <ClientDashboard />
-                  </Layout>
-                </>
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/my-gigs"
-            element={
-              <ProtectedRoute>
-                <>
-                  <Navbar />
-                  <Layout>
-                    <MyGigsPage />
-                  </Layout>
-                </>
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/my-bids"
-            element={
-              <ProtectedRoute>
-                <>
-                  <Navbar />
-                  <Layout>
-                    <MyBidsPage />
-                  </Layout>
-                </>
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/profile"
-            element={
-              <ProtectedRoute>
-                <>
-                  <Navbar />
-                  <Layout>
-                    <ProfilePage />
-                  </Layout>
-                </>
-              </ProtectedRoute>
-            }
-          />
-        </Routes>
-      </div>
+            {/* Protected Routes - With Navbar and Sidebar */}
+            <Route
+              path="/browse"
+              element={
+                <ProtectedRoute>
+                  <>
+                    <Navbar />
+                    <Layout>
+                      <GigFeed />
+                    </Layout>
+                  </>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/gigs/:gigId"
+              element={
+                <ProtectedRoute>
+                  <>
+                    <Navbar />
+                    <Layout>
+                      <GigDetailPage />
+                    </Layout>
+                  </>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/create-gig"
+              element={
+                <ProtectedRoute>
+                  <>
+                    <Navbar />
+                    <Layout>
+                      <CreateGigPage />
+                    </Layout>
+                  </>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/dashboard"
+              element={
+                <ProtectedRoute>
+                  <>
+                    <Navbar />
+                    <Layout>
+                      <ClientDashboard />
+                    </Layout>
+                  </>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/my-gigs"
+              element={
+                <ProtectedRoute>
+                  <>
+                    <Navbar />
+                    <Layout>
+                      <MyGigsPage />
+                    </Layout>
+                  </>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/my-bids"
+              element={
+                <ProtectedRoute>
+                  <>
+                    <Navbar />
+                    <Layout>
+                      <MyBidsPage />
+                    </Layout>
+                  </>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/profile"
+              element={
+                <ProtectedRoute>
+                  <>
+                    <Navbar />
+                    <Layout>
+                      <ProfilePage />
+                    </Layout>
+                  </>
+                </ProtectedRoute>
+              }
+            />
+          </Routes>
+        </div>
+      </SocketProvider>
     </ThemeProvider>
   );
 }

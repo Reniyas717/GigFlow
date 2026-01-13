@@ -1,5 +1,5 @@
-import Bid from '../models/Bid.js';
 import Gig from '../models/Gig.js';
+import Bid from '../models/Bid.js';
 
 export const submitBid = async (req, res) => {
   try {
@@ -9,17 +9,16 @@ export const submitBid = async (req, res) => {
       return res.status(400).json({ message: 'All fields are required' });
     }
 
-    const gig = await Gig.findById(gigId);
+    const gig = await Gig.findById(gigId).populate('ownerId');
     if (!gig) {
       return res.status(404).json({ message: 'Gig not found' });
     }
 
     if (gig.status !== 'open') {
-      return res.status(400).json({ message: 'Gig is no longer open' });
+      return res.status(400).json({ message: 'This gig is no longer accepting bids' });
     }
 
     // Check if user is trying to bid on their own gig
-    // Convert both to strings for proper comparison
     const gigOwnerId = gig.ownerId._id ? gig.ownerId._id.toString() : gig.ownerId.toString();
     const currentUserId = req.user.userId.toString();
 
@@ -27,13 +26,21 @@ export const submitBid = async (req, res) => {
       return res.status(400).json({ message: 'Cannot bid on your own gig' });
     }
 
+    // Check if user has an active bid (pending, hired, or counter-offered)
     const existingBid = await Bid.findOne({
       gigId,
-      freelancerId: req.user.userId
+      freelancerId: req.user.userId,
+      status: { $in: ['pending', 'hired', 'counter-offered'] }
     });
 
     if (existingBid) {
-      return res.status(400).json({ message: 'Already submitted a bid for this gig' });
+      if (existingBid.status === 'hired') {
+        return res.status(400).json({ message: 'You have already been hired for this gig' });
+      } else if (existingBid.status === 'counter-offered') {
+        return res.status(400).json({ message: 'Please respond to the counter-offer first' });
+      } else {
+        return res.status(400).json({ message: 'You have already submitted a bid for this gig' });
+      }
     }
 
     const bid = await Bid.create({
@@ -44,6 +51,25 @@ export const submitBid = async (req, res) => {
       status: 'pending'
     });
 
+    // Populate bid details
+    await bid.populate('freelancerId', 'name email');
+    await bid.populate('gigId', 'title');
+
+    // Emit real-time event to gig owner
+    const io = req.app.get('io');
+    if (io) {
+      io.emitToUser(gig.ownerId.toString(), 'bid:submitted', {
+        bid,
+        gigOwnerId: gig.ownerId.toString()
+      });
+      // Also emit to all for notification count updates
+      io.emit('bid:submitted', {
+        bid,
+        gigOwnerId: gig.ownerId.toString()
+      });
+      console.log('📢 Emitted bid:submitted event for gig:', gig.title);
+    }
+
     res.status(201).json(bid);
   } catch (error) {
     res.status(500).json({ message: 'Server error', error: error.message });
@@ -53,15 +79,6 @@ export const submitBid = async (req, res) => {
 export const getBidsForGig = async (req, res) => {
   try {
     const { gigId } = req.params;
-
-    const gig = await Gig.findById(gigId);
-    if (!gig) {
-      return res.status(404).json({ message: 'Gig not found' });
-    }
-
-    if (gig.ownerId.toString() !== req.user.userId) {
-      return res.status(403).json({ message: 'Not authorized to view bids' });
-    }
 
     const bids = await Bid.find({ gigId })
       .populate('freelancerId', 'name email')
@@ -77,24 +94,27 @@ export const hireBid = async (req, res) => {
   try {
     const { bidId } = req.params;
 
-    const bid = await Bid.findById(bidId);
+    const bid = await Bid.findById(bidId).populate('gigId');
     if (!bid) {
       return res.status(404).json({ message: 'Bid not found' });
     }
 
-    const gig = await Gig.findById(bid.gigId);
-    if (!gig) {
-      return res.status(404).json({ message: 'Gig not found' });
-    }
+    const gig = bid.gigId;
 
+    // Verify the user is the gig owner
     if (gig.ownerId.toString() !== req.user.userId) {
-      return res.status(403).json({ message: 'Only gig owner can hire' });
+      return res.status(403).json({ message: 'Not authorized to hire for this gig' });
     }
 
-    if (gig.status !== 'open') {
-      return res.status(400).json({ message: 'Gig is not open' });
+    if (bid.status === 'hired') {
+      return res.status(400).json({ message: 'This bid has already been hired' });
     }
 
+    if (gig.status === 'assigned') {
+      return res.status(400).json({ message: 'This gig has already been assigned' });
+    }
+
+    // Reject all other bids for this gig
     await Bid.updateMany(
       { gigId: bid.gigId, _id: { $ne: bidId } },
       { status: 'rejected' }
@@ -106,7 +126,143 @@ export const hireBid = async (req, res) => {
     gig.status = 'assigned';
     await gig.save();
 
+    // Emit real-time event to all affected users
+    const io = req.app.get('io');
+    if (io) {
+      // Get all bids for this gig to notify rejected bidders
+      const allBids = await Bid.find({ gigId: bid.gigId });
+
+      io.emit('bid:hired', {
+        bidId: bid._id.toString(),
+        gigId: gig._id.toString(),
+        freelancerId: bid.freelancerId.toString(),
+        gigOwnerId: gig.ownerId.toString(),
+        rejectedBidders: allBids
+          .filter(b => b.status === 'rejected')
+          .map(b => b.freelancerId.toString())
+      });
+      console.log('📢 Emitted bid:hired event for gig:', gig.title);
+    }
+
     res.json({ message: 'Bid hired successfully', bid });
+  } catch (error) {
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+};
+
+export const getMyBids = async (req, res) => {
+  try {
+    const bids = await Bid.find({ freelancerId: req.user.userId })
+      .populate('gigId')
+      .populate('gigId.ownerId', 'name email')
+      .populate('freelancerId', 'name email')
+      .sort({ createdAt: -1 });
+
+    res.json(bids);
+  } catch (error) {
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+};
+
+export const counterOffer = async (req, res) => {
+  try {
+    const { bidId } = req.params;
+    const { price, message } = req.body;
+
+    if (!price || price <= 0) {
+      return res.status(400).json({ message: 'Valid counter-offer price is required' });
+    }
+
+    const bid = await Bid.findById(bidId).populate('gigId');
+    if (!bid) {
+      return res.status(404).json({ message: 'Bid not found' });
+    }
+
+    // Verify the user is the gig owner
+    if (bid.gigId.ownerId.toString() !== req.user.userId) {
+      return res.status(403).json({ message: 'Not authorized' });
+    }
+
+    // Update bid with counter-offer
+    bid.status = 'counter-offered';
+    bid.counterOffer = {
+      price,
+      message: message || `Counter-offer: $${price}`,
+      createdAt: new Date()
+    };
+    await bid.save();
+
+    // Populate for response
+    await bid.populate('freelancerId', 'name email');
+    await bid.populate('gigId', 'title');
+
+    // Emit real-time event
+    const io = req.app.get('io');
+    if (io) {
+      io.emit('bid:counter-offered', {
+        bid,
+        freelancerId: bid.freelancerId._id.toString()
+      });
+      console.log('📢 Emitted bid:counter-offered event');
+    }
+
+    res.json({ message: 'Counter-offer sent successfully', bid });
+  } catch (error) {
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+};
+
+export const acceptCounterOffer = async (req, res) => {
+  try {
+    const { bidId } = req.params;
+
+    const bid = await Bid.findById(bidId).populate('gigId');
+    if (!bid) {
+      return res.status(404).json({ message: 'Bid not found' });
+    }
+
+    // Verify the user is the freelancer
+    if (bid.freelancerId.toString() !== req.user.userId) {
+      return res.status(403).json({ message: 'Not authorized' });
+    }
+
+    if (bid.status !== 'counter-offered') {
+      return res.status(400).json({ message: 'No counter-offer to accept' });
+    }
+
+    // Accept counter-offer: update bid price and hire
+    bid.price = bid.counterOffer.price;
+    bid.status = 'hired';
+    await bid.save();
+
+    // Reject other bids
+    await Bid.updateMany(
+      { gigId: bid.gigId, _id: { $ne: bidId } },
+      { status: 'rejected' }
+    );
+
+    // Update gig status
+    const gig = bid.gigId;
+    gig.status = 'assigned';
+    await gig.save();
+
+    // Emit real-time event
+    const io = req.app.get('io');
+    if (io) {
+      const allBids = await Bid.find({ gigId: bid.gigId });
+      io.emit('bid:hired', {
+        bidId: bid._id.toString(),
+        gigId: gig._id.toString(),
+        freelancerId: bid.freelancerId.toString(),
+        gigOwnerId: gig.ownerId.toString(),
+        rejectedBidders: allBids
+          .filter(b => b.status === 'rejected')
+          .map(b => b.freelancerId.toString())
+      });
+      console.log('📢 Emitted bid:hired event after counter-offer acceptance');
+    }
+
+    res.json({ message: 'Counter-offer accepted and bid hired successfully', bid });
   } catch (error) {
     res.status(500).json({ message: 'Server error', error: error.message });
   }

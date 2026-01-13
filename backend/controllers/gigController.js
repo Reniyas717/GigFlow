@@ -16,18 +16,29 @@ export const createGig = async (req, res) => {
       status: 'open'
     });
 
+    // Populate owner info before emitting
+    await gig.populate('ownerId', 'name email');
+
+    // Emit real-time event to all connected clients
+    const io = req.app.get('io');
+    if (io) {
+      io.emit('gig:created', gig);
+      console.log('📢 Emitted gig:created event:', gig.title);
+    }
+
     res.status(201).json(gig);
   } catch (error) {
     res.status(500).json({ message: 'Server error', error: error.message });
   }
 };
 
+
 export const getGigs = async (req, res) => {
   try {
     const { search } = req.query;
-    
+
     const query = { status: 'open' };
-    
+
     if (search) {
       query.title = { $regex: search, $options: 'i' };
     }
