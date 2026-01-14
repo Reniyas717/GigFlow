@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { createGig, clearError } from './gigSlice';
-import { Briefcase, FileText, DollarSign, Send } from 'lucide-react';
+import { Briefcase, FileText, IndianRupee, Send } from 'lucide-react';
 
 export default function CreateGigPage() {
   const [formData, setFormData] = useState({
@@ -93,11 +93,11 @@ export default function CreateGigPage() {
           {/* Budget */}
           <div>
             <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
-              Budget ($)
+              Budget (₹)
             </label>
             <div className="relative">
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <DollarSign className="h-5 w-5 text-gray-400" />
+                <IndianRupee className="h-5 w-5 text-gray-400" />
               </div>
               <input
                 type="number"

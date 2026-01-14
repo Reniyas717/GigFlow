@@ -3,8 +3,7 @@ import mongoose from 'mongoose';
 const gigSchema = new mongoose.Schema({
   title: {
     type: String,
-    required: true,
-    trim: true
+    required: true
   },
   description: {
     type: String,
@@ -12,9 +11,11 @@ const gigSchema = new mongoose.Schema({
   },
   budget: {
     type: Number,
-    required: true,
-    min: 0
+    required: true
   },
+  skills: [{
+    type: String
+  }],
   ownerId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
@@ -22,25 +23,24 @@ const gigSchema = new mongoose.Schema({
   },
   status: {
     type: String,
-    enum: ['open', 'assigned', 'filled'],
+    enum: ['open', 'assigned', 'filled', 'completed'],
     default: 'open'
   },
   positionsAvailable: {
     type: Number,
-    required: true,
-    min: 1,
     default: 1
   },
   positionsFilled: {
     type: Number,
-    default: 0,
-    min: 0
+    default: 0
   },
   admins: [{
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'User',
-    default: []
-  }]
+    ref: 'User'
+  }],
+  completedAt: {
+    type: Date
+  }
 }, { timestamps: true });
 
 export default mongoose.model('Gig', gigSchema);

@@ -17,29 +17,18 @@ const bidSchema = new mongoose.Schema({
   },
   price: {
     type: Number,
-    required: true,
-    min: 0
+    required: true
   },
   status: {
     type: String,
-    enum: ['pending', 'hired', 'rejected', 'counter-offered'],
+    enum: ['pending', 'hired', 'rejected', 'countered'],
     default: 'pending'
   },
   counterOffer: {
-    price: {
-      type: Number,
-      min: 0
-    },
-    message: {
-      type: String
-    },
-    createdAt: {
-      type: Date
-    }
+    price: Number,
+    message: String,
+    createdAt: Date
   }
 }, { timestamps: true });
-
-// Index for faster queries (not unique to allow rebidding after rejection)
-bidSchema.index({ gigId: 1, freelancerId: 1 });
 
 export default mongoose.model('Bid', bidSchema);

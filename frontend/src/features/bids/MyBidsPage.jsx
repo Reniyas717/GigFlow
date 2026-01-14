@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 import api from '../../utils/api';
 import { useSocket } from '../../context/SocketContext';
 import { useToast, ToastContainer } from '../../components/Toast';
-import { MessageSquare, DollarSign, Clock, CheckCircle, XCircle, Eye, Briefcase } from 'lucide-react';
+import { MessageSquare, IndianRupee, Clock, CheckCircle, XCircle, Eye, Briefcase } from 'lucide-react';
 
 export default function MyBidsPage() {
     const [myBids, setMyBids] = useState([]);
@@ -79,7 +79,7 @@ export default function MyBidsPage() {
                         setMyBids(response.data);
                     };
                     fetchBids();
-                    addToast(`Counter-offer received: $${bid.counterOffer.price}!`, 'info');
+                    addToast(`Counter-offer received: $₹{bid.counterOffer.price}!`, 'info');
                 }
             });
 
@@ -260,7 +260,7 @@ export default function MyBidsPage() {
                                     </div>
                                     <div className="text-right">
                                         <p className="text-sm text-gray-600 dark:text-gray-400">Your Bid</p>
-                                        <p className="text-2xl font-bold text-green-600 dark:text-green-400">${bid.price}</p>
+                                        <p className="text-2xl font-bold text-green-600 dark:text-green-400">₹{bid.price}</p>
                                     </div>
                                 </div>
 
@@ -280,13 +280,13 @@ export default function MyBidsPage() {
                                             <div>
                                                 <p className="text-sm text-gray-600 dark:text-gray-400">New Price:</p>
                                                 <p className="text-3xl font-bold text-yellow-600 dark:text-yellow-400">
-                                                    ${bid.counterOffer.price}
+                                                    ₹{bid.counterOffer.price}
                                                 </p>
                                             </div>
                                             <div className="text-right">
                                                 <p className="text-sm text-gray-600 dark:text-gray-400">Original:</p>
                                                 <p className="text-lg font-semibold text-gray-500 line-through">
-                                                    ${bid.price}
+                                                    ₹{bid.price}
                                                 </p>
                                             </div>
                                         </div>

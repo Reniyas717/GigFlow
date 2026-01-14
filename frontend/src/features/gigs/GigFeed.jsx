@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 import { fetchGigs } from './gigSlice';
 import { useSocket } from '../../context/SocketContext';
 import { useToast, ToastContainer } from '../../components/Toast';
-import { Search, Briefcase, DollarSign, User } from 'lucide-react';
+import { Search, Briefcase, IndianRupee, User } from 'lucide-react';
 
 export default function GigFeed() {
   const [search, setSearch] = useState('');
@@ -12,6 +12,7 @@ export default function GigFeed() {
   const { gigs, loading, error } = useSelector((state) => state.gigs);
   const socket = useSocket();
   const { toasts, addToast, removeToast } = useToast();
+  const user = useSelector((state) => state.auth.user);
 
   useEffect(() => {
     dispatch(fetchGigs());
@@ -19,17 +20,22 @@ export default function GigFeed() {
 
   // Listen for real-time gig creation
   useEffect(() => {
-    if (socket) {
-      socket.on('gig:created', (newGig) => {
-        console.log('📢 New gig received:', newGig.title);
-        // Refresh gigs to include the new one
-        dispatch(fetchGigs());
-        addToast(`New gig available: ${newGig.title}`, 'success');
-      });
+    if (!socket) return;
 
-      return () => socket.off('gig:created');
-    }
-  }, [socket, dispatch, addToast]);
+    const handleNewGig = (newGig) => {
+      dispatch(fetchGigs());
+      // Only show toast if it's not your own gig
+      if (newGig.ownerId !== user?._id && newGig.ownerId !== user?.id) {
+        addToast(`New gig posted: ${newGig.title}`, 'info');
+      }
+    };
+
+    socket.on('gig:created', handleNewGig);
+
+    return () => {
+      socket.off('gig:created', handleNewGig);
+    };
+  }, [socket, dispatch, addToast, user]);
 
   const handleSearch = (e) => {
     e.preventDefault();
@@ -125,9 +131,9 @@ export default function GigFeed() {
 
                 {/* Budget */}
                 <div className="flex items-center gap-2 mb-4 p-3 bg-cyan-50 dark:bg-cyan-900/20 rounded-lg">
-                  <DollarSign className="w-5 h-5 text-cyan-500 dark:text-cyan-300" />
+                  <IndianRupee className="w-5 h-5 text-cyan-500 dark:text-cyan-300" />
                   <span className="text-2xl font-bold text-cyan-500 dark:text-cyan-300">
-                    ${gig.budget}
+                    ₹{gig.budget}
                   </span>
                   <span className="text-sm text-gray-600 dark:text-gray-400">budget</span>
                 </div>

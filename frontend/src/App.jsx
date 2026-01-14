@@ -17,6 +17,7 @@ import GigDetailPage from './features/gigs/GigDetailPage';
 import MyGigsPage from './features/gigs/MyGigsPage';
 import ClientDashboard from './features/bids/ClientDashboard';
 import MyBidsPage from './features/bids/MyBidsPage';
+import MyProjectsPage from './features/gigs/MyProjectsPage';
 
 function App() {
   const dispatch = useDispatch();
@@ -111,6 +112,19 @@ function App() {
                     <Navbar />
                     <Layout>
                       <MyBidsPage />
+                    </Layout>
+                  </>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/my-projects"
+              element={
+                <ProtectedRoute>
+                  <>
+                    <Navbar />
+                    <Layout>
+                      <MyProjectsPage />
                     </Layout>
                   </>
                 </ProtectedRoute>
