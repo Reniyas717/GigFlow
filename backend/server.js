@@ -17,17 +17,7 @@ const httpServer = createServer(app);
 connectDB();
 
 // Initialize Socket.io
-export function initializeSocket(httpServer) {
-  const io = new Server(httpServer, {
-    cors: {
-      origin: ['https://gigflow-reniyas.vercel.app', 'http://localhost:5173'],
-      credentials: true,
-      methods: ['GET', 'POST']
-    }
-  });
-  return io;
-}
-const io=initializeSocket(httpServer);
+const io = initializeSocket(httpServer);
 
 
 // Make io available to routes
