@@ -133,7 +133,7 @@ export default function MyBidsPage() {
         return (
             <div className="flex items-center justify-center min-h-screen">
                 <div className="text-center">
-                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-cyan-500 mx-auto mb-4"></div>
+                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-500 mx-auto mb-4"></div>
                     <p className="text-gray-600 dark:text-gray-400">Loading your bids...</p>
                 </div>
             </div>
@@ -156,19 +156,19 @@ export default function MyBidsPage() {
 
                 {/* Stats Cards */}
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-                    <div className="glass rounded-xl p-6 border border-gray-200 dark:border-slate-700">
+                    <div className="glass rounded-xl p-6 border border-gray-200 dark:border-gray-700">
                         <div className="flex items-center justify-between">
                             <div>
                                 <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Total Bids</p>
                                 <p className="text-3xl font-bold text-gray-900 dark:text-white mt-2">{stats.total}</p>
                             </div>
-                            <div className="p-3 bg-slate-700 dark:bg-cyan-500/20 rounded-lg">
-                                <MessageSquare className="w-6 h-6 text-white dark:text-cyan-400" />
+                            <div className="p-3 bg-slate-700 dark:bg-indigo-500/20 rounded-lg">
+                                <MessageSquare className="w-6 h-6 text-white dark:text-indigo-400" />
                             </div>
                         </div>
                     </div>
 
-                    <div className="glass rounded-xl p-6 border border-gray-200 dark:border-slate-700">
+                    <div className="glass rounded-xl p-6 border border-gray-200 dark:border-gray-700">
                         <div className="flex items-center justify-between">
                             <div>
                                 <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Pending</p>
@@ -180,7 +180,7 @@ export default function MyBidsPage() {
                         </div>
                     </div>
 
-                    <div className="glass rounded-xl p-6 border border-gray-200 dark:border-slate-700">
+                    <div className="glass rounded-xl p-6 border border-gray-200 dark:border-gray-700">
                         <div className="flex items-center justify-between">
                             <div>
                                 <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Hired</p>
@@ -192,7 +192,7 @@ export default function MyBidsPage() {
                         </div>
                     </div>
 
-                    <div className="glass rounded-xl p-6 border border-gray-200 dark:border-slate-700">
+                    <div className="glass rounded-xl p-6 border border-gray-200 dark:border-gray-700">
                         <div className="flex items-center justify-between">
                             <div>
                                 <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Rejected</p>
@@ -212,8 +212,8 @@ export default function MyBidsPage() {
                             key={status}
                             onClick={() => setFilter(status)}
                             className={`px-4 py-2 rounded-lg font-semibold transition-all ${filter === status
-                                ? 'bg-gradient-to-r from-slate-800 to-cyan-500 text-white shadow-lg'
-                                : 'bg-gray-100 dark:bg-slate-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-slate-700'
+                                ? 'bg-gradient-to-r from-slate-800 to-indigo-500 text-white shadow-lg'
+                                : 'bg-gray-100 dark:bg-gray-900 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-slate-700'
                                 }`}
                         >
                             {status.charAt(0).toUpperCase() + status.slice(1)}
@@ -223,7 +223,7 @@ export default function MyBidsPage() {
 
                 {/* Bids List */}
                 {filteredBids.length === 0 ? (
-                    <div className="glass rounded-2xl p-12 text-center border border-gray-200 dark:border-slate-700">
+                    <div className="glass rounded-2xl p-12 text-center border border-gray-200 dark:border-gray-700">
                         <MessageSquare className="w-16 h-16 text-gray-400 mx-auto mb-4" />
                         <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
                             {filter === 'all' ? 'No bids yet' : `No ${filter} bids`}
@@ -236,7 +236,7 @@ export default function MyBidsPage() {
                         </p>
                         <Link
                             to="/browse"
-                            className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-slate-800 to-cyan-500 hover:from-slate-900 hover:to-cyan-600 text-white font-semibold rounded-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all"
+                            className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-slate-800 to-indigo-500 hover:from-slate-900 hover:to-indigo-600 text-white font-semibold rounded-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all"
                         >
                             <Briefcase size={20} />
                             Browse Gigs
@@ -245,12 +245,12 @@ export default function MyBidsPage() {
                 ) : (
                     <div className="space-y-4">
                         {filteredBids.map((bid) => (
-                            <div key={bid._id} className="glass rounded-xl p-6 border border-gray-200 dark:border-slate-700">
+                            <div key={bid._id} className="glass rounded-xl p-6 border border-gray-200 dark:border-gray-700">
                                 <div className="flex justify-between items-start mb-4">
                                     <div className="flex-1">
                                         <Link
                                             to={`/gigs/${bid.gigId._id}`}
-                                            className="text-xl font-bold text-gray-900 dark:text-white hover:text-cyan-600 dark:hover:text-cyan-400 transition-colors"
+                                            className="text-xl font-bold text-gray-900 dark:text-white hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors"
                                         >
                                             {bid.gigId.title}
                                         </Link>
@@ -264,7 +264,7 @@ export default function MyBidsPage() {
                                     </div>
                                 </div>
 
-                                <div className="bg-gray-50 dark:bg-slate-700/50 p-4 rounded-lg mb-4">
+                                <div className="bg-gray-50 dark:bg-gray-800/50 p-4 rounded-lg mb-4">
                                     <p className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Your Proposal:</p>
                                     <p className="text-gray-700 dark:text-gray-300">{bid.message}</p>
                                 </div>
@@ -321,7 +321,7 @@ export default function MyBidsPage() {
                                     </span>
                                     <Link
                                         to={`/gigs/${bid.gigId._id}`}
-                                        className="flex items-center gap-1 text-sm text-cyan-600 dark:text-cyan-400 hover:underline"
+                                        className="flex items-center gap-1 text-sm text-indigo-600 dark:text-indigo-400 hover:underline"
                                     >
                                         <Eye size={16} />
                                         View Gig

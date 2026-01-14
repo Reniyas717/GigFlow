@@ -1,5 +1,5 @@
 @import "tailwindcss";
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@400;500;600;700;800;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Outfit:wght@400;500;600;700;800;900&display=swap');
 
 /* ===== GLOBAL STYLES ===== */
 * {
@@ -10,6 +10,7 @@
 
 body {
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  transition: background-color 0.3s ease;
 }
 
 h1,
@@ -24,32 +25,51 @@ h6 {
 
 /* ===== GLASSMORPHISM ===== */
 .glass {
-  background: rgba(255, 255, 255, 0.85);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(139, 92, 246, 0.2);
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(99, 102, 241, 0.2);
+  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
 }
 
 .dark .glass {
-  background: rgba(15, 23, 42, 0.75);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(251, 191, 36, 0.15);
+  background: rgba(17, 24, 39, 0.8);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(75, 85, 99, 0.3);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.4);
 }
 
 /* ===== GRADIENT TEXT ===== */
 .gradient-text {
-  background: linear-gradient(135deg, #7C3AED 0%, #D97706 100%);
+  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #ec4899 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
+  animation: gradientShift 8s ease infinite;
+  background-size: 200% 200%;
 }
 
 .dark .gradient-text {
-  background: linear-gradient(135deg, #A78BFA 0%, #FCD34D 100%);
+  background: linear-gradient(135deg, #818cf8 0%, #c084fc 50%, #f472b6 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
+  animation: gradientShift 8s ease infinite;
+  background-size: 200% 200%;
+}
+
+/* ===== GRADIENT BACKGROUNDS ===== */
+.gradient-bg-primary {
+  background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+}
+
+.dark .gradient-bg-primary {
+  background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
+}
+
+.gradient-bg-accent {
+  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #ec4899 100%);
 }
 
 /* ===== LINE CLAMP ===== */
@@ -71,7 +91,7 @@ h6 {
 @keyframes fadeIn {
   from {
     opacity: 0;
-    transform: translateY(10px);
+    transform: translateY(20px);
   }
 
   to {
@@ -90,10 +110,86 @@ h6 {
   }
 }
 
+@keyframes gradientShift {
+  0% {
+    background-position: 0% 50%;
+  }
+
+  50% {
+    background-position: 100% 50%;
+  }
+
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+@keyframes float {
+
+  0%,
+  100% {
+    transform: translateY(0px);
+  }
+
+  50% {
+    transform: translateY(-20px);
+  }
+}
+
+@keyframes pulse-glow {
+
+  0%,
+  100% {
+    box-shadow: 0 0 20px rgba(99, 102, 241, 0.3);
+  }
+
+  50% {
+    box-shadow: 0 0 40px rgba(99, 102, 241, 0.6);
+  }
+}
+
 .animate-fade-in {
-  animation: fadeIn 0.5s ease-out;
+  animation: fadeIn 0.8s ease-out;
 }
 
 .animate-slide-in {
   animation: slideIn 0.3s ease-out;
+}
+
+.animate-float {
+  animation: float 6s ease-in-out infinite;
+}
+
+.animate-pulse-glow {
+  animation: pulse-glow 3s ease-in-out infinite;
+}
+
+/* ===== CUSTOM SCROLLBAR ===== */
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f5f9;
+}
+
+.dark ::-webkit-scrollbar-track {
+  background: #0f172a;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 5px;
+}
+
+.dark ::-webkit-scrollbar-thumb {
+  background: #334155;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+.dark ::-webkit-scrollbar-thumb:hover {
+  background: #475569;
 }

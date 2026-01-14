@@ -86,7 +86,7 @@ export default function MyProjectsPage() {
     const renderProjectCard = (project, role) => (
         <div
             key={project._id}
-            className="glass rounded-xl p-6 border border-gray-200 dark:border-slate-700 hover:border-cyan-500 dark:hover:border-cyan-400 transition-all transform hover:scale-105"
+            className="glass rounded-xl p-6 border border-gray-200 dark:border-gray-700 hover:border-indigo-500 dark:hover:border-indigo-400 transition-all transform hover:scale-105"
         >
             <div className="flex items-start justify-between mb-3">
                 <h3 className="font-bold text-lg text-gray-900 dark:text-white line-clamp-2">
@@ -97,7 +97,7 @@ export default function MyProjectsPage() {
                         project.status === 'completed'
                             ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400'
                             : project.status === 'assigned'
-                                ? 'bg-cyan-100 text-cyan-800 dark:bg-cyan-900/30 dark:text-cyan-400'
+                                ? 'bg-indigo-100 text-indigo-800 dark:bg-indigo-900/30 dark:text-indigo-400'
                                 : 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400'
                     }`}>
                         {project.status}
@@ -140,7 +140,7 @@ export default function MyProjectsPage() {
             <div className="flex gap-2">
                 <Link
                     to={`/gigs/${project._id}`}
-                    className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-gradient-to-r from-slate-800 to-cyan-500 hover:from-slate-900 hover:to-cyan-600 text-white font-semibold rounded-lg shadow-lg hover:shadow-xl transition-all"
+                    className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-gradient-to-r from-slate-800 to-indigo-500 hover:from-slate-900 hover:to-indigo-600 text-white font-semibold rounded-lg shadow-lg hover:shadow-xl transition-all"
                 >
                     <Eye size={16} />
                     View Details
@@ -163,7 +163,7 @@ export default function MyProjectsPage() {
         return (
             <div className="flex items-center justify-center min-h-screen">
                 <div className="text-center">
-                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-cyan-500 mx-auto mb-4"></div>
+                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-500 mx-auto mb-4"></div>
                     <p className="text-gray-600 dark:text-gray-400">Loading your projects...</p>
                 </div>
             </div>
@@ -187,18 +187,18 @@ export default function MyProjectsPage() {
 
                 {/* Stats */}
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                    <div className="glass rounded-xl p-6 border border-gray-200 dark:border-slate-700">
+                    <div className="glass rounded-xl p-6 border border-gray-200 dark:border-gray-700">
                         <div className="flex items-center justify-between">
                             <div>
                                 <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Total Projects</p>
                                 <p className="text-3xl font-bold text-gray-900 dark:text-white mt-2">{totalProjects}</p>
                             </div>
-                            <div className="p-3 bg-cyan-600 dark:bg-cyan-500/20 rounded-lg">
-                                <Briefcase className="w-6 h-6 text-white dark:text-cyan-400" />
+                            <div className="p-3 bg-indigo-600 dark:bg-indigo-500/20 rounded-lg">
+                                <Briefcase className="w-6 h-6 text-white dark:text-indigo-400" />
                             </div>
                         </div>
                     </div>
-                    <div className="glass rounded-xl p-6 border border-gray-200 dark:border-slate-700">
+                    <div className="glass rounded-xl p-6 border border-gray-200 dark:border-gray-700">
                         <div className="flex items-center justify-between">
                             <div>
                                 <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Hired</p>
@@ -209,7 +209,7 @@ export default function MyProjectsPage() {
                             </div>
                         </div>
                     </div>
-                    <div className="glass rounded-xl p-6 border border-gray-200 dark:border-slate-700">
+                    <div className="glass rounded-xl p-6 border border-gray-200 dark:border-gray-700">
                         <div className="flex items-center justify-between">
                             <div>
                                 <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Admin Roles</p>
@@ -223,7 +223,7 @@ export default function MyProjectsPage() {
                 </div>
 
                 {totalProjects === 0 ? (
-                    <div className="glass rounded-2xl p-12 text-center border border-gray-200 dark:border-slate-700">
+                    <div className="glass rounded-2xl p-12 text-center border border-gray-200 dark:border-gray-700">
                         <Briefcase className="w-16 h-16 text-gray-400 mx-auto mb-4" />
                         <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
                             No active projects
@@ -233,7 +233,7 @@ export default function MyProjectsPage() {
                         </p>
                         <Link
                             to="/browse"
-                            className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-slate-800 to-cyan-500 hover:from-slate-900 hover:to-cyan-600 text-white font-semibold rounded-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all"
+                            className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-slate-800 to-indigo-500 hover:from-slate-900 hover:to-indigo-600 text-white font-semibold rounded-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all"
                         >
                             <Briefcase size={20} />
                             Browse Gigs

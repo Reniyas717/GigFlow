@@ -173,7 +173,7 @@ export default function MyGigsPage() {
     const renderGigCard = (gig, isAdmin = false) => (
         <div
             key={gig._id}
-            className="glass rounded-xl p-6 border border-gray-200 dark:border-slate-700 hover:border-cyan-500 dark:hover:border-cyan-400 transition-all transform hover:scale-[1.02]"
+            className="glass rounded-xl p-6 border border-gray-200 dark:border-gray-700 hover:border-indigo-500 dark:hover:border-indigo-400 transition-all transform hover:scale-[1.02]"
         >
             <div className="flex items-start justify-between mb-3">
                 <h3 className="font-bold text-lg text-gray-900 dark:text-white line-clamp-2">
@@ -184,7 +184,7 @@ export default function MyGigsPage() {
                         gig.status === 'completed'
                             ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400'
                             : gig.status === 'assigned'
-                                ? 'bg-cyan-100 text-cyan-800 dark:bg-cyan-900/30 dark:text-cyan-400'
+                                ? 'bg-indigo-100 text-indigo-800 dark:bg-indigo-900/30 dark:text-indigo-400'
                                 : 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400'
                     }`}>
                         {gig.status}
@@ -218,7 +218,7 @@ export default function MyGigsPage() {
                 <Link
                     to="/dashboard"
                     state={{ selectedGigId: gig._id }}
-                    className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-gradient-to-r from-slate-800 to-cyan-500 hover:from-slate-900 hover:to-cyan-600 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all"
+                    className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-gradient-to-r from-slate-800 to-indigo-500 hover:from-slate-900 hover:to-indigo-600 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all"
                 >
                     <Eye size={16} />
                     View Bids
@@ -278,7 +278,7 @@ export default function MyGigsPage() {
         return (
             <div className="flex items-center justify-center min-h-screen">
                 <div className="text-center">
-                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-cyan-500 mx-auto mb-4"></div>
+                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-500 mx-auto mb-4"></div>
                     <p className="text-gray-600 dark:text-gray-400">Loading your gigs...</p>
                 </div>
             </div>
@@ -300,18 +300,18 @@ export default function MyGigsPage() {
 
                 {/* Stats */}
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                    <div className="glass rounded-xl p-6 border border-gray-200 dark:border-slate-700">
+                    <div className="glass rounded-xl p-6 border border-gray-200 dark:border-gray-700">
                         <div className="flex items-center justify-between">
                             <div>
                                 <p className="text-sm font-medium text-gray-600 dark:text-gray-400">My Gigs</p>
                                 <p className="text-3xl font-bold text-gray-900 dark:text-white mt-2">{myGigs.length}</p>
                             </div>
-                            <div className="p-3 bg-cyan-600 dark:bg-cyan-500/20 rounded-lg">
-                                <Briefcase className="w-6 h-6 text-white dark:text-cyan-400" />
+                            <div className="p-3 bg-indigo-600 dark:bg-indigo-500/20 rounded-lg">
+                                <Briefcase className="w-6 h-6 text-white dark:text-indigo-400" />
                             </div>
                         </div>
                     </div>
-                    <div className="glass rounded-xl p-6 border border-gray-200 dark:border-slate-700">
+                    <div className="glass rounded-xl p-6 border border-gray-200 dark:border-gray-700">
                         <div className="flex items-center justify-between">
                             <div>
                                 <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Admin Roles</p>
@@ -322,7 +322,7 @@ export default function MyGigsPage() {
                             </div>
                         </div>
                     </div>
-                    <div className="glass rounded-xl p-6 border border-gray-200 dark:border-slate-700">
+                    <div className="glass rounded-xl p-6 border border-gray-200 dark:border-gray-700">
                         <div className="flex items-center justify-between">
                             <div>
                                 <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Active</p>
@@ -338,7 +338,7 @@ export default function MyGigsPage() {
                 </div>
 
                 {myGigs.length === 0 && adminGigs.length === 0 ? (
-                    <div className="glass rounded-2xl p-12 text-center border border-gray-200 dark:border-slate-700">
+                    <div className="glass rounded-2xl p-12 text-center border border-gray-200 dark:border-gray-700">
                         <Briefcase className="w-16 h-16 text-gray-400 mx-auto mb-4" />
                         <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
                             No gigs yet
@@ -348,7 +348,7 @@ export default function MyGigsPage() {
                         </p>
                         <Link
                             to="/create-gig"
-                            className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-slate-800 to-cyan-500 hover:from-slate-900 hover:to-cyan-600 text-white font-semibold rounded-lg shadow-lg"
+                            className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-slate-800 to-indigo-500 hover:from-slate-900 hover:to-indigo-600 text-white font-semibold rounded-lg shadow-lg"
                         >
                             Create Gig
                         </Link>
@@ -388,8 +388,8 @@ export default function MyGigsPage() {
             {/* Admin Modal */}
             {showAdminModal && selectedGig && (
                 <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-                    <div className="glass rounded-2xl max-w-lg w-full border border-gray-200 dark:border-slate-700 max-h-[80vh] overflow-hidden">
-                        <div className="p-6 border-b border-gray-200 dark:border-slate-700 flex items-center justify-between">
+                    <div className="glass rounded-2xl max-w-lg w-full border border-gray-200 dark:border-gray-700 max-h-[80vh] overflow-hidden">
+                        <div className="p-6 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
                             <div>
                                 <h2 className="text-xl font-bold text-gray-900 dark:text-white">Manage Team</h2>
                                 <p className="text-gray-600 dark:text-gray-400 text-sm mt-1">{selectedGig.title}</p>
@@ -404,7 +404,7 @@ export default function MyGigsPage() {
                         <div className="p-6 overflow-y-auto max-h-[60vh]">
                             {loadingHired ? (
                                 <div className="text-center py-8">
-                                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-cyan-500 mx-auto"></div>
+                                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-500 mx-auto"></div>
                                 </div>
                             ) : hiredFreelancers.length === 0 ? (
                                 <p className="text-gray-600 dark:text-gray-400 text-center py-8">
@@ -422,10 +422,10 @@ export default function MyGigsPage() {
                                         return (
                                             <div
                                                 key={bid._id}
-                                                className="flex items-center justify-between p-4 bg-gray-50 dark:bg-slate-700/50 rounded-xl"
+                                                className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-800/50 rounded-xl"
                                             >
                                                 <div className="flex items-center gap-3">
-                                                    <div className="w-10 h-10 bg-gradient-to-r from-cyan-500 to-blue-600 rounded-full flex items-center justify-center text-white font-bold">
+                                                    <div className="w-10 h-10 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-full flex items-center justify-center text-white font-bold">
                                                         {bid.freelancerId?.name?.charAt(0) || '?'}
                                                     </div>
                                                     <div>
@@ -465,8 +465,8 @@ export default function MyGigsPage() {
             {/* Delete Confirmation Modal */}
             {showDeleteModal && gigToDelete && (
                 <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-                    <div className="glass rounded-2xl max-w-md w-full border border-gray-200 dark:border-slate-700">
-                        <div className="p-6 border-b border-gray-200 dark:border-slate-700">
+                    <div className="glass rounded-2xl max-w-md w-full border border-gray-200 dark:border-gray-700">
+                        <div className="p-6 border-b border-gray-200 dark:border-gray-700">
                             <div className="flex items-center gap-3">
                                 <div className="p-3 bg-red-100 dark:bg-red-900/30 rounded-full">
                                     <AlertTriangle className="w-6 h-6 text-red-600 dark:text-red-400" />
@@ -495,14 +495,14 @@ export default function MyGigsPage() {
                                 This action cannot be undone. All bids associated with this gig will also be deleted.
                             </p>
                         </div>
-                        <div className="p-6 border-t border-gray-200 dark:border-slate-700 flex gap-3">
+                        <div className="p-6 border-t border-gray-200 dark:border-gray-700 flex gap-3">
                             <button
                                 onClick={() => {
                                     setShowDeleteModal(false);
                                     setGigToDelete(null);
                                     setDeleteWarning(null);
                                 }}
-                                className="flex-1 px-4 py-3 border border-gray-300 dark:border-slate-600 text-gray-700 dark:text-gray-300 rounded-xl hover:bg-gray-100 dark:hover:bg-slate-700 transition-all font-medium"
+                                className="flex-1 px-4 py-3 border border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-300 rounded-xl hover:bg-gray-100 dark:hover:bg-slate-700 transition-all font-medium"
                             >
                                 Cancel
                             </button>

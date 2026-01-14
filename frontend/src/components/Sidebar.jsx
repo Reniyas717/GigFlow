@@ -20,7 +20,7 @@ export default function Sidebar() {
         { icon: Briefcase, label: 'My Gigs', path: '/my-gigs' },
         { icon: Users, label: 'Gigs I\'m In', path: '/my-projects' },
         { icon: FileText, label: 'My Bids', path: '/my-bids' },
-        {icon: Users, label: 'Profile', path: '/profile' },
+        { icon: Users, label: 'Profile', path: '/profile' },
     ];
 
     const isActive = (path) => location.pathname === path;
@@ -63,7 +63,7 @@ export default function Sidebar() {
 
     return (
         <aside
-            className={`fixed left-0 top-16 h-[calc(100vh-4rem)] bg-white dark:bg-slate-800 border-r border-gray-200 dark:border-slate-700 transition-all duration-300 z-40 ${isCollapsed ? 'w-20' : 'w-64'
+            className={`fixed left-0 top-16 h-[calc(100vh-4rem)] bg-white/90 dark:bg-gray-900/90 backdrop-blur-sm border-r border-gray-200 dark:border-gray-700 transition-all duration-300 z-40 ${isCollapsed ? 'w-20' : 'w-64'
                 }`}
         >
             <div className="flex flex-col h-full">
@@ -77,11 +77,10 @@ export default function Sidebar() {
                             <Link
                                 key={item.path}
                                 to={item.path}
-                                className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${
-                                    isActive
-                                        ? 'bg-gradient-to-r from-cyan-500 to-blue-600 text-white'
-                                        : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-700'
-                                }`}
+                                className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${isActive
+                                        ? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white'
+                                        : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'
+                                    }`}
                             >
                                 <Icon size={20} /> {/* Render the component with JSX */}
                                 {!isCollapsed && <span className="font-medium">{item.label}</span>}
@@ -97,7 +96,7 @@ export default function Sidebar() {
                 </nav>
 
                 {/* Logout Button */}
-                <div className="p-4 border-t border-gray-200 dark:border-slate-700">
+                <div className="p-4 border-t border-gray-200 dark:border-gray-700">
                     <button
                         onClick={handleLogout}
                         className="flex items-center gap-3 w-full px-4 py-3 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
@@ -110,7 +109,7 @@ export default function Sidebar() {
                 {/* Collapse Toggle */}
                 <button
                     onClick={() => setIsCollapsed(!isCollapsed)}
-                    className="absolute -right-3 top-8 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-full p-1.5 hover:bg-gray-100 dark:hover:bg-slate-700 transition-colors"
+                    className="absolute -right-3 top-8 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-full p-1.5 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
                 >
                     {isCollapsed ? <ChevronRight size={14} /> : <ChevronLeft size={14} />}
                 </button>

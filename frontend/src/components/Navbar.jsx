@@ -18,7 +18,7 @@ export default function Navbar() {
   };
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 bg-white dark:bg-slate-800 shadow-md border-b border-gray-200 dark:border-slate-700">
+    <nav className="fixed top-0 left-0 right-0 z-50 bg-white/90 dark:bg-gray-900/90 backdrop-blur-sm shadow-md border-b border-gray-200 dark:border-gray-700">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
@@ -31,13 +31,13 @@ export default function Navbar() {
             {/* Theme Toggle */}
             <button
               onClick={toggleTheme}
-              className="p-2 rounded-lg bg-gray-100 dark:bg-slate-700 hover:bg-gray-200 dark:hover:bg-slate-600 transition-colors"
+              className="p-2 rounded-lg bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
               aria-label="Toggle theme"
             >
               {theme === 'light' ? (
-                <Moon size={20} className="text-gray-700 dark:text-gray-300" />
+                <Moon size={20} className="text-indigo-600" />
               ) : (
-                <Sun size={20} className="text-gray-300" />
+                <Sun size={20} className="text-yellow-400" />
               )}
             </button>
 
@@ -48,13 +48,13 @@ export default function Navbar() {
                 </span>
                 <Link
                   to="/create-gig"
-                  className="px-4 py-2 bg-slate-700 hover:bg-slate-800 text-white rounded-lg font-medium transition-all transform hover:scale-105"
+                  className="px-4 py-2 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white rounded-lg font-medium transition-all transform hover:scale-105"
                 >
                   Create Gig
                 </Link>
                 <Link
                   to="/dashboard"
-                  className="px-4 py-2 bg-gray-100 dark:bg-slate-700 hover:bg-gray-200 dark:hover:bg-slate-600 text-gray-800 dark:text-gray-200 rounded-lg font-medium transition-all"
+                  className="px-4 py-2 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-800 dark:text-gray-200 rounded-lg font-medium transition-all"
                 >
                   Dashboard
                 </Link>
@@ -69,13 +69,13 @@ export default function Navbar() {
               <>
                 <Link
                   to="/login"
-                  className="px-4 py-2 text-gray-700 dark:text-gray-300 hover:text-slate-700 dark:hover:text-cyan-400 font-medium transition-colors"
+                  className="px-4 py-2 text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 font-medium transition-colors"
                 >
                   Login
                 </Link>
                 <Link
                   to="/register"
-                  className="px-4 py-2 bg-slate-700 hover:bg-slate-800 text-white rounded-lg font-medium transition-all transform hover:scale-105"
+                  className="px-4 py-2 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white rounded-lg font-medium transition-all transform hover:scale-105"
                 >
                   Register
                 </Link>
@@ -87,14 +87,14 @@ export default function Navbar() {
           <div className="md:hidden flex items-center gap-2">
             <button
               onClick={toggleTheme}
-              className="p-2 rounded-lg bg-gray-100 dark:bg-slate-700"
+              className="p-2 rounded-lg bg-gray-100 dark:bg-gray-800"
               aria-label="Toggle theme"
             >
-              {theme === 'light' ? <Moon size={20} /> : <Sun size={20} />}
+              {theme === 'light' ? <Moon size={20} className="text-indigo-600" /> : <Sun size={20} className="text-yellow-400" />}
             </button>
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="p-2 rounded-lg bg-gray-100 dark:bg-slate-700"
+              className="p-2 rounded-lg bg-gray-100 dark:bg-gray-800"
             >
               {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
             </button>
@@ -104,23 +104,23 @@ export default function Navbar() {
 
       {/* Mobile Menu */}
       {mobileMenuOpen && (
-        <div className="md:hidden bg-white dark:bg-slate-800 border-t border-gray-200 dark:border-slate-700 animate-slide-in">
+        <div className="md:hidden bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700 animate-slide-in">
           <div className="px-4 py-4 space-y-3">
             {isAuthenticated ? (
               <>
-                <div className="text-gray-700 dark:text-gray-300 pb-2 border-b border-gray-200 dark:border-slate-700">
+                <div className="text-gray-700 dark:text-gray-300 pb-2 border-b border-gray-200 dark:border-gray-700">
                   Hello, <span className="font-semibold">{user?.name}</span>
                 </div>
                 <Link
                   to="/create-gig"
-                  className="block px-4 py-2 bg-slate-700 text-white rounded-lg text-center font-medium"
+                  className="block px-4 py-2 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-lg text-center font-medium"
                   onClick={() => setMobileMenuOpen(false)}
                 >
                   Create Gig
                 </Link>
                 <Link
                   to="/dashboard"
-                  className="block px-4 py-2 bg-gray-100 dark:bg-slate-700 text-gray-800 dark:text-gray-200 rounded-lg text-center font-medium"
+                  className="block px-4 py-2 bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200 rounded-lg text-center font-medium"
                   onClick={() => setMobileMenuOpen(false)}
                 >
                   Dashboard
@@ -139,14 +139,14 @@ export default function Navbar() {
               <>
                 <Link
                   to="/login"
-                  className="block px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-700 rounded-lg text-center font-medium"
+                  className="block px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg text-center font-medium"
                   onClick={() => setMobileMenuOpen(false)}
                 >
                   Login
                 </Link>
                 <Link
                   to="/register"
-                  className="block px-4 py-2 bg-slate-700 text-white rounded-lg text-center font-medium"
+                  className="block px-4 py-2 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-lg text-center font-medium"
                   onClick={() => setMobileMenuOpen(false)}
                 >
                   Register

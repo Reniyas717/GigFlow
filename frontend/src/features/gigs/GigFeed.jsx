@@ -67,11 +67,11 @@ export default function GigFeed() {
               placeholder="Search gigs by title..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="w-full pl-12 pr-32 py-4 bg-white dark:bg-slate-800 border-2 border-gray-200 dark:border-slate-700 rounded-xl focus:outline-none focus:border-slate-700 dark:focus:border-cyan-400 text-gray-900 dark:text-white text-lg transition-all shadow-sm"
+              className="w-full pl-12 pr-32 py-4 bg-white dark:bg-gray-900 border-2 border-gray-200 dark:border-gray-700 rounded-xl focus:outline-none focus:border-indigo-500 dark:focus:border-indigo-400 text-gray-900 dark:text-white text-lg transition-all shadow-sm"
             />
             <button
               type="submit"
-              className="absolute right-2 top-2 px-6 py-2 bg-gradient-to-r from-slate-800 to-cyan-500 hover:from-slate-800 hover:to-cyan-600 text-white font-semibold rounded-lg transition-all transform hover:scale-105"
+              className="absolute right-2 top-2 px-6 py-2 bg-gradient-to-r from-slate-800 to-indigo-500 hover:from-slate-800 hover:to-indigo-600 text-white font-semibold rounded-lg transition-all transform hover:scale-105"
             >
               Search
             </button>
@@ -117,10 +117,10 @@ export default function GigFeed() {
             {gigs.map((gig) => (
               <div
                 key={gig._id}
-                className="glass rounded-2xl p-6 hover:shadow-2xl transform hover:scale-105 transition-all duration-300 border border-gray-200 dark:border-slate-700 group"
+                className="glass rounded-2xl p-6 hover:shadow-2xl transform hover:scale-105 transition-all duration-300 border border-gray-200 dark:border-gray-700 group"
               >
                 {/* Title */}
-                <h3 className="text-xl font-bold mb-3 text-gray-900 dark:text-white group-hover:text-slate-700 dark:group-hover:text-cyan-400 transition-colors line-clamp-2">
+                <h3 className="text-xl font-bold mb-3 text-gray-900 dark:text-white group-hover:text-slate-700 dark:group-hover:text-indigo-400 transition-colors line-clamp-2">
                   {gig.title}
                 </h3>
 
@@ -130,9 +130,9 @@ export default function GigFeed() {
                 </p>
 
                 {/* Budget */}
-                <div className="flex items-center gap-2 mb-4 p-3 bg-cyan-50 dark:bg-cyan-900/20 rounded-lg">
-                  <IndianRupee className="w-5 h-5 text-cyan-500 dark:text-cyan-300" />
-                  <span className="text-2xl font-bold text-cyan-500 dark:text-cyan-300">
+                <div className="flex items-center gap-2 mb-4 p-3 bg-indigo-50 dark:bg-indigo-900/20 rounded-lg">
+                  <IndianRupee className="w-5 h-5 text-indigo-500 dark:text-indigo-300" />
+                  <span className="text-2xl font-bold text-indigo-500 dark:text-indigo-300">
                     ₹{gig.budget}
                   </span>
                   <span className="text-sm text-gray-600 dark:text-gray-400">budget</span>
@@ -156,7 +156,7 @@ export default function GigFeed() {
                 {/* View Details Button */}
                 <Link
                   to={`/gigs/${gig._id}`}
-                  className="block w-full px-4 py-3 bg-gradient-to-r from-slate-800 to-cyan-500 hover:from-slate-800 hover:to-cyan-600 text-white text-center font-semibold rounded-lg transition-all transform hover:scale-105 shadow-lg"
+                  className="block w-full px-4 py-3 bg-gradient-to-r from-slate-800 to-indigo-500 hover:from-slate-800 hover:to-indigo-600 text-white text-center font-semibold rounded-lg transition-all transform hover:scale-105 shadow-lg"
                 >
                   View Details
                 </Link>

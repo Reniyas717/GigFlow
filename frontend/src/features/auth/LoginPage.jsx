@@ -2,7 +2,8 @@ import { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, Link } from 'react-router-dom';
 import { login, clearError } from './authSlice';
-import { Mail, Lock, LogIn } from 'lucide-react';
+import { Mail, Lock, LogIn, Sun, Moon } from 'lucide-react';
+import { useTheme } from '../../context/ThemeContext';
 
 export default function LoginPage() {
   const [formData, setFormData] = useState({
@@ -13,6 +14,7 @@ export default function LoginPage() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { loading, error, isAuthenticated } = useSelector((state) => state.auth);
+  const { theme, toggleTheme } = useTheme();
 
   // Navigate to browse page ONLY after successful login
   useEffect(() => {
@@ -35,18 +37,37 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 via-white to-cyan-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 px-4 py-12">
-      <div className="w-full max-w-md">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 via-blue-50 to-purple-50 dark:bg-gradient-to-br dark:from-black dark:via-gray-900 dark:to-black px-4 py-12 relative">
+      {/* Animated Background Overlay */}
+      <div className="fixed inset-0 z-0 opacity-20 dark:opacity-10 pointer-events-none">
+        <div className="absolute top-0 left-1/4 w-96 h-96 bg-purple-300 dark:bg-purple-900 rounded-full mix-blend-multiply dark:mix-blend-lighten filter blur-3xl animate-float"></div>
+        <div className="absolute top-1/3 right-1/4 w-96 h-96 bg-blue-300 dark:bg-blue-900 rounded-full mix-blend-multiply dark:mix-blend-lighten filter blur-3xl animate-float" style={{ animationDelay: '2s' }}></div>
+      </div>
+
+      {/* Theme Toggle */}
+      <button
+        onClick={toggleTheme}
+        className="fixed top-6 right-6 z-50 p-3 rounded-full bg-white/90 dark:bg-gray-900/90 shadow-xl hover:shadow-2xl transition-all transform hover:scale-110 border border-gray-200 dark:border-gray-700 backdrop-blur-sm"
+        aria-label="Toggle theme"
+      >
+        {theme === 'light' ? (
+          <Moon size={24} className="text-indigo-600" />
+        ) : (
+          <Sun size={24} className="text-yellow-400" />
+        )}
+      </button>
+
+      <div className="w-full max-w-md relative z-10">
         {/* Logo */}
         <div className="text-center mb-8">
           <Link to="/" className="inline-block">
-            <h1 className="text-4xl font-bold gradient-text">GigFlow</h1>
+            <h1 className="text-5xl font-black gradient-text">GigFlow</h1>
           </Link>
-          <p className="mt-2 text-gray-600 dark:text-gray-400">Welcome back!</p>
+          <p className="mt-3 text-lg text-gray-600 dark:text-gray-300">Welcome back!</p>
         </div>
 
         {/* Login Card */}
-        <div className="glass rounded-2xl shadow-2xl p-8 border border-gray-200 dark:border-slate-700">
+        <div className="glass rounded-3xl shadow-2xl p-8 border border-gray-200 dark:border-gray-700">
           <h2 className="text-3xl font-bold mb-6 text-center text-gray-900 dark:text-white">
             Sign In
           </h2>
@@ -72,7 +93,7 @@ export default function LoginPage() {
                   name="email"
                   value={formData.email}
                   onChange={handleChange}
-                  className="w-full pl-10 pr-4 py-3 bg-white dark:bg-slate-700 border-2 border-gray-200 dark:border-slate-600 rounded-lg focus:outline-none focus:border-slate-700 dark:focus:border-cyan-400 text-gray-900 dark:text-white transition-all"
+                  className="w-full pl-10 pr-4 py-3 bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:border-indigo-500 dark:focus:border-indigo-400 text-gray-900 dark:text-white transition-all"
                   placeholder="you@example.com"
                   required
                 />
@@ -93,7 +114,7 @@ export default function LoginPage() {
                   name="password"
                   value={formData.password}
                   onChange={handleChange}
-                  className="w-full pl-10 pr-4 py-3 bg-white dark:bg-slate-700 border-2 border-gray-200 dark:border-slate-600 rounded-lg focus:outline-none focus:border-slate-700 dark:focus:border-cyan-400 text-gray-900 dark:text-white transition-all"
+                  className="w-full pl-10 pr-4 py-3 bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:border-indigo-500 dark:focus:border-indigo-400 text-gray-900 dark:text-white transition-all"
                   placeholder="••••••••"
                   required
                 />
@@ -104,7 +125,7 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-slate-800 to-cyan-500 hover:from-slate-800 hover:to-cyan-600 text-white font-semibold rounded-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+              className="w-full flex items-center justify-center gap-2 px-6 py-4 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-bold rounded-xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
             >
               <LogIn size={20} />
               {loading ? 'Signing in...' : 'Sign In'}
@@ -117,7 +138,7 @@ export default function LoginPage() {
               Don't have an account?{' '}
               <Link
                 to="/register"
-                className="text-slate-700 dark:text-cyan-400 hover:text-slate-800 dark:hover:text-blue-300 font-semibold transition-colors"
+                className="text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 font-semibold transition-colors"
               >
                 Create one now
               </Link>

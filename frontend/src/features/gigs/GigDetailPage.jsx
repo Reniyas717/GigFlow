@@ -117,7 +117,7 @@ export default function GigDetailPage() {
         return (
             <div className="flex items-center justify-center min-h-screen">
                 <div className="text-center">
-                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-cyan-500 mx-auto mb-4"></div>
+                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-500 mx-auto mb-4"></div>
                     <p className="text-gray-600 dark:text-gray-400">Loading gig details...</p>
                 </div>
             </div>
@@ -131,7 +131,7 @@ export default function GigDetailPage() {
                     <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Gig not found</h2>
                     <button
                         onClick={() => navigate('/browse')}
-                        className="text-cyan-500 hover:text-cyan-600"
+                        className="text-indigo-500 hover:text-indigo-600"
                     >
                         Back to Browse
                     </button>
@@ -147,14 +147,14 @@ export default function GigDetailPage() {
                 {/* Back Button */}
                 <button
                     onClick={() => navigate(-1)}
-                    className="flex items-center gap-2 text-gray-600 dark:text-gray-400 hover:text-cyan-500 dark:hover:text-cyan-400 mb-6 transition-colors"
+                    className="flex items-center gap-2 text-gray-600 dark:text-gray-400 hover:text-indigo-500 dark:hover:text-indigo-400 mb-6 transition-colors"
                 >
                     <ArrowLeft size={20} />
                     Back
                 </button>
 
                 {/* Gig Details Card */}
-                <div className="glass rounded-2xl p-8 border border-gray-200 dark:border-slate-700 mb-8">
+                <div className="glass rounded-2xl p-8 border border-gray-200 dark:border-gray-700 mb-8">
                     <div className="flex items-start justify-between mb-6">
                         <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
                             {gig.title}
@@ -163,7 +163,7 @@ export default function GigDetailPage() {
                             gig.status === 'open'
                                 ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400'
                                 : gig.status === 'assigned'
-                                    ? 'bg-cyan-100 text-cyan-800 dark:bg-cyan-900/30 dark:text-cyan-400'
+                                    ? 'bg-indigo-100 text-indigo-800 dark:bg-indigo-900/30 dark:text-indigo-400'
                                     : gig.status === 'completed'
                                         ? 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400'
                                         : 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300'
@@ -203,7 +203,7 @@ export default function GigDetailPage() {
                                 {gig.skills.map((skill, index) => (
                                     <span
                                         key={index}
-                                        className="flex items-center gap-1 px-3 py-1 bg-cyan-100 dark:bg-cyan-900/30 text-cyan-800 dark:text-cyan-400 rounded-full text-sm"
+                                        className="flex items-center gap-1 px-3 py-1 bg-indigo-100 dark:bg-indigo-900/30 text-indigo-800 dark:text-indigo-400 rounded-full text-sm"
                                     >
                                         <Tag size={14} />
                                         {skill}
@@ -219,23 +219,23 @@ export default function GigDetailPage() {
                 </div>
 
                 {/* Bid Section */}
-                <div className="glass rounded-2xl p-8 border border-gray-200 dark:border-slate-700">
+                <div className="glass rounded-2xl p-8 border border-gray-200 dark:border-gray-700">
                     <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-6">Submit Your Bid</h2>
                     
                     {checkingBid ? (
                         <div className="text-center py-4">
-                            <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-cyan-500 mx-auto"></div>
+                            <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-indigo-500 mx-auto"></div>
                         </div>
                     ) : canBid ? (
                         <button
                             onClick={openBidModal}
-                            className="w-full bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-700 hover:to-blue-700 text-white font-semibold py-4 px-6 rounded-xl shadow-lg hover:shadow-xl transition-all flex items-center justify-center gap-2"
+                            className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-semibold py-4 px-6 rounded-xl shadow-lg hover:shadow-xl transition-all flex items-center justify-center gap-2"
                         >
                             <Send size={20} />
                             Submit Your Bid
                         </button>
                     ) : userBid ? (
-                        <div className="glass rounded-xl p-6 border border-gray-200 dark:border-slate-700">
+                        <div className="glass rounded-xl p-6 border border-gray-200 dark:border-gray-700">
                             <div className="text-center mb-4">
                                 <p className="text-gray-600 dark:text-gray-400 mb-3">
                                     You have already submitted a bid for this gig
@@ -335,11 +335,11 @@ export default function GigDetailPage() {
             {/* Bid Modal - FIXED */}
             {showBidModal && (
                 <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-                    <div className="glass rounded-2xl max-w-md w-full border border-gray-200 dark:border-slate-700">
-                        <div className="p-6 border-b border-gray-200 dark:border-slate-700">
+                    <div className="glass rounded-2xl max-w-md w-full border border-gray-200 dark:border-gray-700">
+                        <div className="p-6 border-b border-gray-200 dark:border-gray-700">
                             <h2 className="text-xl font-bold text-gray-900 dark:text-white">Submit Your Bid</h2>
                             <p className="text-gray-600 dark:text-gray-400 text-sm mt-1">for "{gig.title}"</p>
-                            <p className="text-cyan-600 dark:text-cyan-400 text-sm mt-2 flex items-center gap-1">
+                            <p className="text-indigo-600 dark:text-indigo-400 text-sm mt-2 flex items-center gap-1">
                                 <IndianRupee size={14} />
                                 Client's Budget: ₹{gig.budget?.toLocaleString('en-IN')}
                             </p>
@@ -363,7 +363,7 @@ export default function GigDetailPage() {
                                             const value = e.target.value.replace(/[^0-9]/g, '');
                                             setBidPrice(value);
                                         }}
-                                        className="w-full pl-10 pr-4 py-3 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all text-lg font-semibold"
+                                        className="w-full pl-10 pr-4 py-3 border border-gray-300 dark:border-gray-700 rounded-xl bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all text-lg font-semibold"
                                         placeholder="Enter your amount"
                                         autoFocus
                                     />
@@ -380,7 +380,7 @@ export default function GigDetailPage() {
                                     value={bidMessage}
                                     onChange={(e) => setBidMessage(e.target.value)}
                                     rows={4}
-                                    className="w-full px-4 py-3 border border-gray-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all"
+                                    className="w-full px-4 py-3 border border-gray-300 dark:border-gray-700 rounded-xl bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
                                     placeholder="Explain why you're the best fit for this gig..."
                                     required
                                 />
@@ -389,14 +389,14 @@ export default function GigDetailPage() {
                                 <button
                                     type="button"
                                     onClick={() => setShowBidModal(false)}
-                                    className="flex-1 px-4 py-3 border border-gray-300 dark:border-slate-600 text-gray-700 dark:text-gray-300 rounded-xl hover:bg-gray-100 dark:hover:bg-slate-700 transition-all font-medium"
+                                    className="flex-1 px-4 py-3 border border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-300 rounded-xl hover:bg-gray-100 dark:hover:bg-slate-700 transition-all font-medium"
                                 >
                                     Cancel
                                 </button>
                                 <button
                                     type="submit"
                                     disabled={submitting || !bidPrice}
-                                    className="flex-1 px-4 py-3 bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-700 hover:to-blue-700 text-white rounded-xl transition-all font-semibold disabled:opacity-50 flex items-center justify-center gap-2"
+                                    className="flex-1 px-4 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white rounded-xl transition-all font-semibold disabled:opacity-50 flex items-center justify-center gap-2"
                                 >
                                     {submitting ? (
                                         <>

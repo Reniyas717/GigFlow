@@ -84,7 +84,7 @@ export default function ProfilePage() {
         return (
             <div className="flex items-center justify-center min-h-screen">
                 <div className="text-center">
-                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-cyan-500 mx-auto mb-4"></div>
+                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-500 mx-auto mb-4"></div>
                     <p className="text-gray-600 dark:text-gray-400">Loading profile...</p>
                 </div>
             </div>
@@ -96,9 +96,9 @@ export default function ProfilePage() {
             <ToastContainer toasts={toasts} removeToast={removeToast} />
             <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
                 {/* Profile Header */}
-                <div className="glass rounded-2xl p-8 border border-gray-200 dark:border-slate-700 mb-8">
+                <div className="glass rounded-2xl p-8 border border-gray-200 dark:border-gray-700 mb-8">
                     <div className="flex items-center gap-6">
-                        <div className="w-24 h-24 bg-gradient-to-r from-cyan-500 to-blue-600 rounded-full flex items-center justify-center text-white text-4xl font-bold shadow-lg">
+                        <div className="w-24 h-24 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-full flex items-center justify-center text-white text-4xl font-bold shadow-lg">
                             {user?.name?.charAt(0).toUpperCase() || 'U'}
                         </div>
                         <div>
@@ -119,19 +119,19 @@ export default function ProfilePage() {
 
                 {/* Stats Grid */}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-                    <div className="glass rounded-xl p-6 border border-gray-200 dark:border-slate-700">
+                    <div className="glass rounded-xl p-6 border border-gray-200 dark:border-gray-700">
                         <div className="flex items-center justify-between">
                             <div>
                                 <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Total Bids</p>
                                 <p className="text-3xl font-bold text-gray-900 dark:text-white mt-2">{stats.totalBids}</p>
                             </div>
-                            <div className="p-3 bg-cyan-600 dark:bg-cyan-500/20 rounded-lg">
-                                <Briefcase className="w-6 h-6 text-white dark:text-cyan-400" />
+                            <div className="p-3 bg-indigo-600 dark:bg-indigo-500/20 rounded-lg">
+                                <Briefcase className="w-6 h-6 text-white dark:text-indigo-400" />
                             </div>
                         </div>
                     </div>
 
-                    <div className="glass rounded-xl p-6 border border-gray-200 dark:border-slate-700">
+                    <div className="glass rounded-xl p-6 border border-gray-200 dark:border-gray-700">
                         <div className="flex items-center justify-between">
                             <div>
                                 <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Times Hired</p>
@@ -143,7 +143,7 @@ export default function ProfilePage() {
                         </div>
                     </div>
 
-                    <div className="glass rounded-xl p-6 border border-gray-200 dark:border-slate-700">
+                    <div className="glass rounded-xl p-6 border border-gray-200 dark:border-gray-700">
                         <div className="flex items-center justify-between">
                             <div>
                                 <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Completed Projects</p>
@@ -155,7 +155,7 @@ export default function ProfilePage() {
                         </div>
                     </div>
 
-                    <div className="glass rounded-xl p-6 border border-gray-200 dark:border-slate-700">
+                    <div className="glass rounded-xl p-6 border border-gray-200 dark:border-gray-700">
                         <div className="flex items-center justify-between">
                             <div>
                                 <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Total Earnings</p>
@@ -167,19 +167,19 @@ export default function ProfilePage() {
                         </div>
                     </div>
 
-                    <div className="glass rounded-xl p-6 border border-gray-200 dark:border-slate-700">
+                    <div className="glass rounded-xl p-6 border border-gray-200 dark:border-gray-700">
                         <div className="flex items-center justify-between">
                             <div>
                                 <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Gigs Created</p>
-                                <p className="text-3xl font-bold text-blue-600 dark:text-blue-400 mt-2">{stats.createdGigs}</p>
+                                <p className="text-3xl font-bold text-purple-600 dark:text-blue-400 mt-2">{stats.createdGigs}</p>
                             </div>
-                            <div className="p-3 bg-blue-600 dark:bg-blue-500/20 rounded-lg">
+                            <div className="p-3 bg-purple-600 dark:bg-blue-500/20 rounded-lg">
                                 <TrendingUp className="w-6 h-6 text-white dark:text-blue-400" />
                             </div>
                         </div>
                     </div>
 
-                    <div className="glass rounded-xl p-6 border border-gray-200 dark:border-slate-700">
+                    <div className="glass rounded-xl p-6 border border-gray-200 dark:border-gray-700">
                         <div className="flex items-center justify-between">
                             <div>
                                 <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Gigs Completed (Owner)</p>
@@ -194,7 +194,7 @@ export default function ProfilePage() {
 
                 {/* Completed Projects Section */}
                 {completedProjects.length > 0 && (
-                    <div className="glass rounded-2xl p-8 border border-gray-200 dark:border-slate-700">
+                    <div className="glass rounded-2xl p-8 border border-gray-200 dark:border-gray-700">
                         <div className="flex items-center gap-3 mb-6">
                             <Award className="w-6 h-6 text-purple-500" />
                             <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
@@ -239,7 +239,7 @@ export default function ProfilePage() {
 
                 {/* Empty State for Completed Projects */}
                 {completedProjects.length === 0 && (
-                    <div className="glass rounded-2xl p-8 border border-gray-200 dark:border-slate-700 text-center">
+                    <div className="glass rounded-2xl p-8 border border-gray-200 dark:border-gray-700 text-center">
                         <Award className="w-12 h-12 text-gray-400 mx-auto mb-4" />
                         <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
                             No completed projects yet
