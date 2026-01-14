@@ -21,12 +21,15 @@ import MyProjectsPage from './features/gigs/MyProjectsPage';
 
 function App() {
   const dispatch = useDispatch();
-  const { isAuthenticated } = useSelector((state) => state.auth);
+  const { isAuthenticated, token } = useSelector((state) => state.auth);
 
-  // Load user on app mount to maintain auth across refreshes
+  // Load user on app mount ONLY if token exists
   useEffect(() => {
-    dispatch(loadUser());
-  }, [dispatch]);
+    const storedToken = localStorage.getItem('token');
+    if (storedToken && !isAuthenticated) {
+      dispatch(loadUser());
+    }
+  }, []); // Run only once on mount
 
   return (
     <ThemeProvider>

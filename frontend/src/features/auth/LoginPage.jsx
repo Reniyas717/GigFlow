@@ -14,9 +14,10 @@ export default function LoginPage() {
   const navigate = useNavigate();
   const { loading, error, isAuthenticated } = useSelector((state) => state.auth);
 
+  // Navigate to browse page ONLY after successful login
   useEffect(() => {
     if (isAuthenticated) {
-      navigate('/browse');
+      navigate('/browse', { replace: true });
     }
   }, [isAuthenticated, navigate]);
 

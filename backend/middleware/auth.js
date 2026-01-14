@@ -3,7 +3,14 @@ import bcrypt from 'bcryptjs';
 import User from '../models/User.js';
 
 export const authenticate = (req, res, next) => {
-  const token = req.cookies.token;
+  // Get token from Authorization header
+  const authHeader = req.headers.authorization;
+  
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    return res.status(401).json({ message: 'Authentication required' });
+  }
+
+  const token = authHeader.substring(7); // Remove 'Bearer ' prefix
 
   if (!token) {
     return res.status(401).json({ message: 'Authentication required' });

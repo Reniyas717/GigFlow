@@ -27,14 +27,9 @@ export const register = async (req, res) => {
       expiresIn: '7d'
     });
 
-    res.cookie('token', token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
-      maxAge: 7 * 24 * 60 * 60 * 1000
-    });
-
+    // Return token in response instead of cookie
     res.status(201).json({
+      token,
       user: {
         id: user._id,
         name: user.name,
@@ -68,14 +63,9 @@ export const login = async (req, res) => {
       expiresIn: '7d'
     });
 
-    res.cookie('token', token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
-      maxAge: 7 * 24 * 60 * 60 * 1000
-    });
-
+    // Return token in response instead of cookie
     res.json({
+      token,
       user: {
         id: user._id,
         name: user.name,
@@ -98,7 +88,8 @@ export const getMe = async (req, res) => {
       user: {
         id: user._id,
         name: user.name,
-        email: user.email
+        email: user.email,
+        createdAt: user.createdAt
       }
     });
   } catch (error) {
@@ -134,5 +125,10 @@ export const updateProfile = async (req, res) => {
   } catch (error) {
     res.status(500).json({ message: 'Failed to update profile', error: error.message });
   }
+};
+
+export const logout = async (req, res) => {
+  // No need to clear cookies, just return success
+  res.json({ message: 'Logged out successfully' });
 };
 
